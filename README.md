@@ -1,4 +1,4 @@
-![Logo do Cito Labs](./assets/cito-labs-logo.png)
+![Logo do Cito Labs](<img src="./assets/logo-cito-labs.png" align="center">)
 
 <div align="center">
 
