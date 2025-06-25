@@ -4,8 +4,6 @@ Este repositório reúne meus estudos, exercícios, anotações e projetos desen
 
 > Esta experiência tem sido um desafio enriquecedor, tanto pelo uso de tecnologias novas quanto pela adaptação ao sistema operacional **Linux Mint**, que até então eu não dominava.
 
----
-
 ## 📁 Estrutura do Repositório
 
 - [`exercicios/`](exercicios) — Exercícios práticos e de fixação baseados nos conteúdos estudados.
@@ -14,26 +12,23 @@ Este repositório reúne meus estudos, exercícios, anotações e projetos desen
 - [`assets/`](assets) — Recursos visuais utilizados no repositório.
 - [`certificados/`](certificados) — Certificados obtidos ao longo do estágio.
 
----
+
 
 ## 🚀 Como Utilizar
 
 1. **Ambiente de desenvolvimento:** Instale uma IDE de sua preferência e um ambiente local (como **XAMPP** ou **Laragon**) para executar os projetos PHP.
 2. **Conhecimento prévio:** Embora parte do conteúdo seja introdutório, é recomendável ter uma noção básica de lógica de programação para acompanhar melhor o material.
 
----
+
 
 ## ✍️ Atualizações
 
 Este repositório está em constante evolução. Novos conteúdos, atividades e projetos serão adicionados ao longo do tempo conforme avanço no estágio e nos estudos.
 
----
 
 ## ⚖️ Licença
 
 Este projeto está licenciado sob a [MIT License](LICENSE).
-
----
 
 ## 👤 Autor
 
