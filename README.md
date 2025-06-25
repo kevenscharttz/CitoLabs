@@ -2,7 +2,7 @@
   <img src="./assets/cito-labs-logo.png" alt="Logo do Cito Labs" width="200"/>
 </div>
 
-
+---
 <div align="center">
 
 <!-- Linguagens -->
