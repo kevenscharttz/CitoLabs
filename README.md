@@ -7,9 +7,13 @@ Este repositório reúne meus estudos, exercícios, anotações e projetos desen
 ## 📁 Estrutura do Repositório
 
 - [`exercicios/`](exercicios) — Exercícios práticos e de fixação baseados nos conteúdos estudados.
+  
 - [`projetos/`](projetos) — Projetos desenvolvidos para aplicar os conhecimentos adquiridos.
+  
 - [`anotacoes/`](anotacoes) — Anotações organizadas por linguagem ou módulo.
+  
 - [`assets/`](assets) — Recursos visuais utilizados no repositório.
+
 - [`certificados/`](certificados) — Certificados obtidos ao longo do estágio.
 
 
@@ -17,8 +21,8 @@ Este repositório reúne meus estudos, exercícios, anotações e projetos desen
 ## 🚀 Como Utilizar
 
 1. **Ambiente de desenvolvimento:** Instale uma IDE de sua preferência e um ambiente local (como **XAMPP** ou **Laragon**) para executar os projetos PHP.
+  
 2. **Conhecimento prévio:** Embora parte do conteúdo seja introdutório, é recomendável ter uma noção básica de lógica de programação para acompanhar melhor o material.
-
 
 
 ## ✍️ Atualizações
@@ -37,5 +41,7 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 **Keven Willians Scharttz de Melo**
 
 [![GitHub](https://img.shields.io/badge/-kevenscharttz-black?style=flat-square&logo=GitHub&logoColor=white)](https://github.com/kevenscharttz)  
+
 [![LinkedIn](https://img.shields.io/badge/-kevenscharttz-blue?style=flat-square&logo=Linkedin&logoColor=white)](https://www.linkedin.com/in/kevenscharttz/)  
+
 [![Gmail](https://img.shields.io/badge/-kevenscha@gmail.com-c14438?style=flat-square&logo=Gmail&logoColor=white)](mailto:kevenscha@gmail.com)
