@@ -10,14 +10,19 @@ Este repositório foi feito para armazenar todo o material de estudo, exercicios
 ## Estrutura do Repositório 🗃️
 
 - [`exercicios/`](exercicios): Local onde armazeno todos os exercicios práticos e de fixação do que estudo
+  
 
 - [`projetos/`](projetos): Área destinada para armazenar os meus projetos desenvolvidos usando determinadas técnologias.
+  
 
 - [`anotacoes/`](anotacoes): Contém todas as minhas anotações, separadas pelas linguagens e módulos de estudo.
+  
 
-- `assets/`: Pasta destinada unicamente a armazenar recursos visuais do repositório
+- `assets/`: Pasta destinada unicamente a armazenar recursos visuais do repositório.
+  
 
 - [`certificados/`](certificados): Pasta destinada para armazenar os certificados obtidos durante meus estudos.
+  
 
 ## Como Utilizar Esse Conteúdo ❓
 
