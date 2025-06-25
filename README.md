@@ -1,3 +1,4 @@
+
 # Cito Labs 🔬
 
 Este repositório reúne meus estudos, exercícios, anotações e projetos desenvolvidos durante meu estágio no **Cito Labs**. Ele documenta minha jornada de aprendizado em programação, com foco em **PHP**, frameworks como **Laravel** e **Filament**, além de desenvolvimento web com **HTML**, **CSS**, **Bootstrap**, **Tailwind CSS** e **JavaScript**. Também inclui fundamentos de **bancos de dados (MySQL)** e versionamento com **Git**.
