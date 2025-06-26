@@ -14,7 +14,7 @@
 
 <!-- Frameworks -->
 ![Laravel](https://img.shields.io/badge/laravel-%23FF2D20.svg?style=for-the-badge&logo=laravel&logoColor=white)
-![Composer](https://img.shields.io/badge/composer-000000?style=for-the-badge&logo=composer&logoColor=white)
+![Composer](https://img.shields.io/badge/composer-4E342E?style=for-the-badge&logo=composer&logoColor=white)
 ![Symfony](https://img.shields.io/badge/symfony-%23000000.svg?style=for-the-badge&logo=symfony&logoColor=white)
 ![Filament](https://img.shields.io/badge/Filament-FFAA00?style=for-the-badge&logoColor=%23000000)
 ![Bootstrap](https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white)
