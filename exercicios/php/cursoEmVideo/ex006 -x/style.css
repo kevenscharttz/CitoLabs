@@ -1,0 +1,94 @@
+body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "National Park", sans-serif;
+    background-color: #06031F;
+}
+
+h1 {
+    color: white;
+    font-family: sans-serif;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    background-color: #6A1EFF;
+    width: 500px;
+    height: 400px;
+    padding: 30px;
+    border-radius: 25px;
+}
+
+label {
+    color: white;
+    font-size: 30px;
+    font-weight: bolder;
+}
+
+input {
+    border: none;
+    border-radius: 15px;
+    padding-block: 10px;
+    margin-bottom: 50px;
+    font-size: 40px;
+}
+
+p,
+strong,
+a {
+    color: white;
+    font-family: "National Park", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+
+}
+
+div {
+    display: flex;
+    color: white;
+    flex-direction: column;
+    background-color: #8b51ff;
+    padding: 30px;
+    border-radius: 25px;
+}
+
+#submit {
+    padding-block: 25px;
+    color: white;
+    background-color: #3800B3;
+}
+
+#submit:hover {
+    cursor: pointer;
+    background-color: #2f0096;
+}
+
+@media only screen and (max-width: 425px) {
+    form {
+        display: flex;
+        flex-direction: column;
+        background-color: #6A1EFF;
+        width: 300px;
+        height: 270px;
+        padding: 30px;
+        border-radius: 25px;
+    }
+
+    label {
+        color: white;
+        font-size: 20px;
+        font-weight: bolder;
+    }
+
+    input {
+        border: none;
+        border-radius: 15px;
+        padding-block: 10px;
+        margin-bottom: 30px;
+        font-size: 20px;
+    }
+}

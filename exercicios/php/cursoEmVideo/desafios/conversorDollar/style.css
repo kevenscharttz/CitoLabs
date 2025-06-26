@@ -1,0 +1,77 @@
+body {
+    width: 100%;
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "National Park", sans-serif;
+    background-color: #06031F;
+}
+
+h1 {
+    color: white;
+    font-family: sans-serif;
+    text-align: center;
+    font-size: 45px;
+}
+
+div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #6A1EFF;
+    width: 500px;
+    height: 460px;
+    padding: 30px;
+    border-radius: 25px;
+}
+
+form {
+    height: 100px;
+}
+
+label {
+    color: white;
+    font-size: 20px;
+    font-weight: bolder;
+}
+
+input {
+    border: none;
+    border-radius: 15px;
+    padding-block: 10px;
+    margin-bottom: 50px;
+    font-size: 40px;
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    background-color: #8b51ff;
+    padding: 30px;
+    border-radius: 25px;
+}
+
+p {
+    color: white;
+    font-family: "National Park", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+
+}
+
+button {
+    border-radius: 15px;
+    border: none;
+    display: block;
+    height: 40px;
+    color: rgb(0, 0, 0);
+    font-family: "National Park", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#submit {
+    width: 100%;
+}
