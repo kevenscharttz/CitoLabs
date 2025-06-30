@@ -362,3 +362,231 @@ Lembrando que essa ferramenta é para a verificação de como o código está es
 
 ## Phan
 
+Não mudando muito o método, para a instalação do Phan nada muda tanto, aquele básico **composer idev phan/phan**. Depois para executarmos o novo pacote que baixamos, precisaremos habilitar uma extensão. No retorno da instalação, somos informados que se a extensão de ASTs não tiver habilitada, devemos rodar o comando com o parâmetro `--allow-polyfill-parser`. Para não entrarmos em detalhes sobre o uso de extensões, sempre rodaremos com esse parâmetro.
+
+## Scripts no JSON
+
+Acho que concordamos que ficar escrevendo esses códigos enormes não é muito prático, com certeza vamos acabar errando algum ou simplesmente o esquecendo de vez. Porém é possível adicionar uma sessão no nosso composer.json, para meio que ter "resumos" de cada um desses comandos imensos:
+
+```json
+{
+    "name": "kevenscharttz/buscador-cursos",
+    "description": "Uma biblioteca para buscar os cursos da Alura",
+    "type": "library",
+    "authors":
+        [
+            {
+                "name": "Keven Willians",
+                "email": "kevenscha@gmail.com"
+            }
+        ],
+    "license": "MIT",
+    "require": {
+        "guzzlehttp/guzzle": "^7.9",
+        "symfony/dom-crawler": "^7.3",
+        "symfony/css-selector": "^7.3"
+    },
+    "autoload": {
+        "files": [
+            "./functions.php"
+        ],
+
+        "psr-4": {
+            "Alura\\BuscadorDeCursos\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12",
+        "squizlabs/php_codesniffer": "^3.13",
+        "phan/phan": "^5.4"
+    },
+    "scripts": {
+        "test": "phpunit tests/TestBuscadorDeCursos.php",
+        "cs": "phpcs --standard=PSR12 src/",
+        "phan": "phan --allow-polyfill-parser src/"
+    }
+}
+```
+
+## Compondo Scripts
+
+Podemos também meio que "concatenar" esses scripts, para usar múltiplos ao mesmo tempo, da seguinte forma: 
+
+```json
+{
+    "name": "kevenscharttz/buscador-cursos",
+    "description": "Uma biblioteca para buscar os cursos da Alura",
+    "type": "library",
+    "authors":
+        [
+            {
+                "name": "Keven Willians",
+                "email": "kevenscha@gmail.com"
+            }
+        ],
+    "license": "MIT",
+    "require": {
+        "guzzlehttp/guzzle": "^7.9",
+        "symfony/dom-crawler": "^7.3",
+        "symfony/css-selector": "^7.3"
+    },
+    "autoload": {
+        "files": [
+            "./functions.php"
+        ],
+
+        "psr-4": {
+            "Alura\\BuscadorDeCursos\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12",
+        "squizlabs/php_codesniffer": "^3.13",
+        "phan/phan": "^5.4"
+    },
+    "scripts": {
+        "test": "phpunit tests/TestBuscadorDeCursos.php",
+        "cs": "phpcs --standard=PSR12 src/",
+        "phan": "phan --allow-polyfill-parser",
+        "check": [
+            "@phan",
+            "@cs",
+            "@test"
+        ]
+    }
+}
+
+```
+
+Se notar, foi utilizado "@" no começos dos elementos que devem referenciar os scripts de **test**, **cs** e **phan**. O arroba é necessário pois se não, apenas tentariam usar as palavras mesmo. E outro detalhe bem bacana que esqueci de comentar antes, os scripts que nós incluímos também aparecem na listagem de códigos do composer, quando usamos **composer list**, vários comandos aparecem, mostrando o que podemos fazer no composer, com uma descrição para cada comando, porém os scripts adicionados não tem uma descrição, tem apenas um texto genérico.
+
+Para resolver isso, podemos incluir no **composer.json** o **json
+scripts-descriptions**, onde podemos definir descrições para nossos scripts.
+
+```json
+{
+    "name": "kevenscharttz/buscador-cursos",
+    "description": "Uma biblioteca para buscar os cursos da Alura",
+    "type": "library",
+    "authors":
+        [
+            {
+                "name": "Keven Willians",
+                "email": "kevenscha@gmail.com"
+            }
+        ],
+    "license": "MIT",
+    "require": {
+        "guzzlehttp/guzzle": "^7.9",
+        "symfony/dom-crawler": "^7.3",
+        "symfony/css-selector": "^7.3"
+    },
+    "autoload": {
+        "files": [
+            "./functions.php"
+        ],
+
+        "psr-4": {
+            "Alura\\BuscadorDeCursos\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12",
+        "squizlabs/php_codesniffer": "^3.13",
+        "phan/phan": "^5.4"
+    },
+    "scripts": {
+        "test": "phpunit tests/TestBuscadorDeCursos.php",
+        "cs": "phpcs --standard=PSR12 src/",
+        "phan": "phan --allow-polyfill-parser",
+        "check": [
+            "@phan",
+            "@cs",
+            "@test"
+        ]
+    },
+    "scripts-descriptions": {
+        "check": "Roda as verificações do código. PHAN, PHPCS e PHPUNIT"
+    }
+}
+```
+
+## Mais sobre Scripts
+
+Será que só é possível executar comandos que o próprio Composer baixou? Na verdade não, e qualquer comando do sistema operacional pode ser executado por meio dele. Por exemplo, no Windows, o comando **dir** serve para listar os arquivos, já no Linux é **ls**, podemos configurar no composer para quando for digitado **composer ls**, execute o comando **dir**.
+
+Outro exemplo, podemos usar para executar um script PHP.
+## Eventos e Scripts
+
+Eventos são processos (ou momentos) específicos dentro do fluxo de trabalho do Composer, e você pode "ganchar" seus scripts personalizados nesses eventos para que sejam executados automaticamente, podemos fazer varias tarefas, por exemplo, limpar o cache depois de uma instalação, as possibilidades são várias:
+
+```php
+{
+    "name": "kevenscharttz/buscador-cursos",
+    "description": "Uma biblioteca para buscar os cursos da Alura",
+    "type": "library",
+    "authors":
+        [
+            {
+                "name": "Keven Willians",
+                "email": "kevenscha@gmail.com"
+            }
+        ],
+    "license": "MIT",
+    "require": {
+        "guzzlehttp/guzzle": "^7.9",
+        "symfony/dom-crawler": "^7.3",
+        "symfony/css-selector": "^7.3"
+    },
+    "autoload": {
+        "files": [
+            "./functions.php"
+        ],
+
+        "psr-4": {
+            "Alura\\BuscadorDeCursos\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12",
+        "squizlabs/php_codesniffer": "^3.13",
+        "phan/phan": "^5.4"
+    },
+    "scripts": {
+        "test": "phpunit tests/TestBuscadorDeCursos.php",
+        "cs": "phpcs --standard=PSR12 src/",
+        "phan": "phan --allow-polyfill-parser",
+        "check": [
+            "@phan",
+            "@cs",
+            "@test"
+        ],
+        "post-update-cmd": [
+            "@check"
+        ]
+    },
+    "scripts-descriptions": {
+        "check": "Roda as verificações do código. PHAN, PHPCS e PHPUNIT"
+    }
+}
+
+```
+
+
+## Versionamento
+
+Como o Composer está diretamente ligado com sistemas de controle de versão, como o Git, às vezes podemos acabar confundindo a versão de um pacote no Composer com o versionamento de cada commit no Git. No Composer, cada versão de um pacote, como as que definimos no `composer.json`, são informadas por meio de tags. Ou seja, podemos criar tags com nomes específicos que o Composer entenderá como a versão do pacote.
+
+Para criarmos nossa primeira versão do projeto, usamos o comando **git tag -a v1.0.0**. Note que o número da versão não é aleatório! Existe um esquema de versionamento chamado **SemVer**, ou **"Semantic Versioning".** Ele define que o primeiro número é a versão princial ("MAJOR version" ou "versão maior"), que indica quebra de compatibilidade. Por exemplo, imagine que nosso buscador deixa de retornar um array e passa a retornar um `Generator`. Nesse caso, trocaríamos a versão de `v1.0.0` para `v2.0.0`, afinal temos uma quebra de compatibilidade e quem está usando nosso sistema/pacote precisa saber disso.
+
+Se adicionarmos alguma compatibilidade sem quebrar nada, utilizamos o segundo número, referente à "MINOR version" (ou "versão menor"). Nesse caso, adicionamos alguma funcionalidade, por exemplo, mas tudo que existia continua funcionando. Já quando temos mudanças menores ou correções de bugs, o terceiro e último número, conhecido como "PATCH version" ("versão de correção"), é utilizado. Assim, teremos
+
+## Constraints
+
+Como falado em outras aulas, esse simbolo de **^** serve para o composer compreender que pode baixar atualizações desses pacotes até a versão **major version**, ou seja, até que a compatibilidade quebre.
+
+Quando usamos o **-** estamos dizendo que podemos baixar os pacotes dentro de uma faixa de versões, de tal até tal.
+
+Já o * serve para informar ue, no local onde ele é inserido, qualquer valor será válido.
+
+O til **~**, é equivalente á sintaxe de maiour ou igual a, e menor igual a: **>=1.2 < 2.0.0**
