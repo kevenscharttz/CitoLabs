@@ -14,7 +14,6 @@ class Student
         $this->name = $name;
         $this->birthDate = $birthDate;
     }
-
     public function id(): ?int
     {
         return $this->id;
