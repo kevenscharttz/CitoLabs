@@ -1,23 +1,22 @@
 <?php
 
-    require_once('./src/conexao.php');
+require_once('./src/conexao.php');
+require_once('./src/Model.php');
+require_once('./src/Repository.php');
 
-    $sqlCommand = "SELECT * FROM produtos WHERE tipo = 'café' ORDER BY preco ASC;";
-    $sqlCommand2 = "SELECT * FROM produtos WHERE tipo = 'almoço' ORDER BY preco ASC;";
-    $statement = $dbConnection -> query($sqlCommand);
-    $produtosCafe = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-    $statement2 = $dbConnection -> query($sqlCommand2);
-    $produtosAlmoco = $statement2->fetchAll(PDO::FETCH_ASSOC)
+$produtosRepositorio = new ProdutoRepositorio($dbConnection);
+$dadosCafe = $produtosRepositorio->opcoesCafe();
+$dadosAlmoco = $produtosRepositorio->opcoesAlmoco()
 
 ?>
 
 <!doctype html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/index.css">
@@ -28,6 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>Serenatto - Cardápio</title>
 </head>
+
 <body>
     <main>
         <section class="container-banner">
@@ -39,42 +39,43 @@
         <section class="container-cafe-manha">
             <div class="container-cafe-manha-titulo">
                 <h3>Opções para o Café</h3>
-                <img class= "ornaments" src="img/ornaments-coffee.png" alt="ornaments">
+                <img class="ornaments" src="img/ornaments-coffee.png" alt="ornaments">
             </div>
             <div class="container-cafe-manha-produtos">
                 <?php
-                    foreach ($produtosCafe as $produtoCafe):
-                ?>    
-                    
+                foreach ($dadosCafe as $cafe):
+                ?>
+
                     <div class="container-produto">
-                    <div class="container-foto">
-                        <img src="./img/<?=$produtoCafe['imagem']?>">
+                        <div class="container-foto">
+                            <img src="<?= $cafe->getImagem() ?>">
+                        </div>
+                        <p><?= $cafe->getNome(); ?></p>
+                        <p><?= $cafe->getDescricao(); ?></p>
+                        <p><?= $cafe->getPreco() ?></p>
                     </div>
-                    <p><?=$produtoCafe['nome']?></p>
-                    <p><?=$produtoCafe['descricao']?></p>
-                    <p><?='R$ '. number_format($produtoCafe['preco'], 2, ',', '.')?></p>
-                </div>
-                <?php endforeach;?>
+                <?php endforeach; ?>
             </div>
         </section>
         <section class="container-almoco">
             <div class="container-almoco-titulo">
                 <h3>Opções para o Almoço</h3>
-                <img class= "ornaments" src="img/ornaments-coffee.png" alt="ornaments">
+                <img class="ornaments" src="img/ornaments-coffee.png" alt="ornaments">
             </div>
             <div class="container-almoco-produtos">
-                <?php foreach($produtosAlmoco as $produtoAlmoco): ?>
-                <div class="container-produto">
-                    <div class="container-foto">
-                        <img src="./img/<?=$produtoAlmoco['imagem']?>">
+                <?php foreach ($dadosAlmoco as $almoco): ?>
+                    <div class="container-produto">
+                        <div class="container-foto">
+                            <img src="<?= $almoco->getImagem() ?>">
+                        </div>
+                        <p><?= $almoco->getNome() ?></p>
+                        <p><?= $almoco->getDescricao() ?></p>
+                        <p><?= $almoco->getPreco() ?></p>
                     </div>
-                    <p><?=$produtoAlmoco['nome']?></p>
-                    <p><?=$produtoAlmoco['descricao']?></p>
-                    <p><?='R$ ' . number_format($produtoAlmoco['preco'], 2, ',', '.')?></p>
-                </div>
                 <?php endforeach; ?>
             </div>
         </section>
     </main>
 </body>
+
 </html>

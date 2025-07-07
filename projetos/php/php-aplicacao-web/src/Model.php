@@ -8,7 +8,7 @@ class Produto {
     private $imagem;
     private $preco;
 
-    public function __constructor() {
+    public function __construct($id, $tipo, $nome, $descricao, $imagem, $preco) {
         $this->id = $id;
         $this->tipo = $tipo;
         $this->nome = $nome;
@@ -18,27 +18,27 @@ class Produto {
     }
 
     public function getId(){
-        return $id;
+        return $this->id;
     }
 
     public function getTipo(){
-        return $tipo;
+        return $this->tipo;
     }
 
     public function getNome(){
-        return $nome;
+        return $this->nome;
     }
 
     public function getDescricao(){
-        return $descricao;
+        return $this->descricao;
     }
 
     public function getImagem(){
-        return $imagem;
+        return "./img/" . $this->imagem;
     }
 
     public function getPreco(){
-        return $preco;
+        return 'R$ ' . number_format($this->preco, 2, ',', '.'); 
     }
 
     public function setId($id){
