@@ -39,4 +39,18 @@ class ProdutoRepositorio
 
         return $dadosAlmoco;
     }
+
+    public function opcoes()
+    {
+        $sqlCommand3 = "SELECT * FROM produtos ORDER BY preco ASC;";
+
+        $statement3 = $this->pdo->query($sqlCommand3);
+        $produtos = $statement3->fetchAll(PDO::FETCH_ASSOC);
+
+        $dados = array_map(function ($produto) {
+            return new Produto($produto['id'], $produto['tipo'], $produto['nome'], $produto['descricao'], $produto['imagem'], $produto['preco']);
+        }, $produtos);
+
+        return $dados;
+    }
 }
