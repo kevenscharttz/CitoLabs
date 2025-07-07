@@ -2,8 +2,8 @@
 
     require_once('./src/conexao.php');
 
-    $sqlCommand = "SELECT * FROM produtos WHERE tipo = 'café';";
-    $sqlCommand2 = "SELECT * FROM produtos WHERE tipo = 'almoço';";
+    $sqlCommand = "SELECT * FROM produtos WHERE tipo = 'café' ORDER BY preco ASC;";
+    $sqlCommand2 = "SELECT * FROM produtos WHERE tipo = 'almoço' ORDER BY preco ASC;";
     $statement = $dbConnection -> query($sqlCommand);
     $produtosCafe = $statement->fetchAll(PDO::FETCH_ASSOC);
 
