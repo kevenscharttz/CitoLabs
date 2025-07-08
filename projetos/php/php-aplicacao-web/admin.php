@@ -55,7 +55,7 @@ $dados = $produtos->opcoes();
               <td><?= $dado->getNome() ?></td>
               <td><?= $dado->getTipo() ?></td>
               <td> <?= $dado->getDescricao() ?></td>
-              <td><?php $dado->getPreco() ?></td>
+              <td><?= $dado->getPreco()?></td>
               <td><a class="botao-editar" href="editar-produto.html">Editar</a></td>
               <td>
                 <form action="excluir-produto.php" method="POST">
