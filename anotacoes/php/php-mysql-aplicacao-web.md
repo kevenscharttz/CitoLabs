@@ -120,7 +120,7 @@ class Produto {
 
 ## Usando um array de produtos
 
-Com a classe feita, agora nós podemos criar um array de objetos, funcionando da seguinte forma: graças ao array_map isso é possível, o **array_map** é como se fosse um foreach, porém com a diferença de que ele serve para executar funções e nos devolver um novo array com as alterações passadas em sua **calback**, dentro do projeto, foi feito uma função para instanciar objetos , passando o array que queria tirar os dados e armazenando o novo array de objetos em uma nova variável:
+Com a classe feita, agora nós podemos criar um array de objetos, funcionando da seguinte forma: graças ao array_map isso é possível, o **array_map** é como se fosse um foreach, porém com a diferença de que ele serve para executar funções e nos devolver um novo array com as alterações passadas em sua **callback**, dentro do projeto, foi feito uma função para instanciar objetos , passando o array que queria tirar os dados e armazenando o novo array de objetos em uma nova variável:
 
 ```php
     {
@@ -136,3 +136,35 @@ Com a classe feita, agora nós podemos criar um array de objetos, funcionando da
         return $dadosCafe;
     }
 ```
+
+## Excluindo um produto
+
+Bom, para começarmos a entender como excluir esses arquivos, vamos usar a listagem que está na tela de admin. Nessa tela há apenas abertura de fechamento de tag **form**, e um input de **submit**. Para começar é necessário incluir nesse formulário para onde o usuário deve ir ao clicar no botão de submit, co contexto do projeto, devendo ir para o **excluir-produto.php**, e para isso devemos usar o **action** no formulário.
+
+Depois disso, precisamos conseguir passar informação o suficiente para o nosso software entender qual produto deve ser excluído, mas como podemos fazer isso? Passando o id para esse outro lugar, mas como ele não tem exatamente um proposito além de ser apenas um envio de dados, pode ser deixado como **type="hidden"**, dessa forma não aparecendo na tela.
+
+Para de fato enviar algo para a outra página, da maneira mais simples possível, vamos precisar incluir um **name** nesse input invisível, para que dessa forma ele consiga ser enviado para URL, já que por padrão o método de envio é do tipo **GET**.
+
+```php
+<form action="excluir-produto.php">
+    <input type="hidden" name="id" value="<?= $dado->getId()?>">
+    <input type="submit" class="botao-excluir" value="Excluir">
+</form>
+```
+
+
+Agora chegou a hora de realmente criar a função que irá apagar as tuplas, primeiro criamos uma função publica que recebe como parâmetro o **$id** e criamos uma variável com a nossa instrução **SQL** de exclusão, porém com um detalhe, usaremos uma **interrogação ( ? )**, que podemos passar um parâmetro pra ela através do PDO e depois ao invés de usarmos o **query**, como temos feito até o momento, usaremos o **prepare** pois queremos trabalhar com instruções preparadas, ou seja, queremos prepará-las antes de enviá-las, pois ainda enviaremos um parâmetro como ID.
+
+Depois disso, guardando esse Statement, usamos o método **bindValue**, que serve para evitar SQLInjections, pois forçamos que tudo que seja enviado seja tratado como dados, e não um comando. Além disso vai ser para enviar ao nosso comando, no lugar da interrogação, o $id que estamos obtendo como parametro desse método.
+
+Por fim, usamos o método **execute**, fazendo com que o comando que preparamos finalmente seja executado.
+
+```php
+public function deletar($id) {
+    $sqlCOmmandDelete = "DELETE * FROM produtos WHERE id = $id";
+    $statementDelete = $this->pdo->prepare($sqlCOmmandDelete);
+    statementDelete->bindValue(1, $id);
+    $statementDelete->execute();
+    }
+```
+
