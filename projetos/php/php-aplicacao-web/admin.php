@@ -56,7 +56,7 @@ $dados = $produtos->opcoes();
               <td><?= $dado->getTipo() ?></td>
               <td> <?= $dado->getDescricao() ?></td>
               <td><?= $dado->getPreco()?></td>
-              <td><a class="botao-editar" href="editar-produto.html">Editar</a></td>
+              <td><a class="botao-editar" href="editar-produto.php">Editar</a></td>
               <td>
                 <form action="excluir-produto.php" method="POST">
                   <input type="hidden" name="id" value="<?= $dado->getId()?>">
@@ -67,7 +67,7 @@ $dados = $produtos->opcoes();
           <?php endforeach; ?>
         </tbody>
       </table>
-      <a class="botao-cadastrar" href="cadastrar-produto.html">Cadastrar produto</a>
+      <a class="botao-cadastrar" href="cadastrar-produto.php">Cadastrar produto</a>
       <form action="#" method="post">
         <input type="submit" class="botao-cadastrar" value="Baixar Relatório" />
       </form>

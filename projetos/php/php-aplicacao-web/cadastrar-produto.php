@@ -1,3 +1,14 @@
+<?php 
+
+require_once("./src/conexao.php");
+require_once("./src/Model.php");
+require_once("./src/Repository.php");
+
+$produto = new Produto(null, $_POST['tipo'], $_POST['nome'], $_POST['descricao'], $_POST['preco'], $_POST['imagem']);
+
+
+?>
+
 <!doctype html>
 <html lang="pt-br">
 <head>
@@ -24,7 +35,7 @@
         <img class= "ornaments" src="img/ornaments-coffee.png" alt="ornaments">
     </section>
     <section class="container-form">
-        <form action="#">
+        <form action="#" method="POST">
 
             <label for="nome">Nome</label>
             <input type="text" id="nome" name="nome" placeholder="Digite o nome do produto" required>

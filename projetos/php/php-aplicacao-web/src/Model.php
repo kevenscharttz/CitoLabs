@@ -8,13 +8,14 @@ class Produto {
     private $imagem;
     private $preco;
 
-    public function __construct($id, $tipo, $nome, $descricao, $imagem, $preco) {
+    public function __construct($id, $tipo, $nome, $descricao, $preco, $imagem='logo-serenatto.png') {
         $this->id = $id;
         $this->tipo = $tipo;
         $this->nome = $nome;
         $this->descricao = $descricao;
-        $this->imagem = $imagem;
         $this->preco = $preco;
+        $this->imagem = $imagem;
+        
     }
 
     public function getId(){
