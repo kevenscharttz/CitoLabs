@@ -168,3 +168,36 @@ public function deletar($id) {
     }
 ```
 
+## Adicionando um produto
+
+Para começar, vamos precisar alterar a extensão do arquivo para o tipo **PHP**, e alterar o formulário para que faça seu envio pelo método **POST**, pois por padrão ele é sempre enviado como **GET**. Agora, seria interessante que ao cadastrarmos um produto, fosse criado um objeto do tipo **Produto** e fizéssemos essa persistência no banco de dados, para isso primeiro vamos precisar passar os **requires** para o arquivo de cadastro.
+
+Com esse arquivo já com acesso as outras classes, instanciamos um novo produto, passando em seus parâmetros os itens salvos no **POST**, mas agora pense comigo, ao incluirmos um novo produto, podemos não saber exatamente qual será seu **ID**, então o certo seria criar esse objeto com essa propriedade nula, já que seria lhe dado um **ID** no banco de dados, fora que por regras de negócios, será necessário trocar a ordem do preço e imagem, para que possamos incluir um resultado padrão para as imagens, caso nenhuma seja passada.
+
+Com isso feito, nos resta outro problema, ao acessar o cadastro podemos nos deparar com um erro do sistema tentando criar um objeto, mas sem dados para isso. Para corrigirmos isso, podemos fazer um simples condicional usando a **função** **isset**, passando o **POST** gerado pelo botão que usamos para dar submit, ou seja, com o **name** desse input no **POST**.
+
+A função **ISSET** serve para verificarmos se a variável passada por parâmetro existe, caso exista será executado o que há dentro do bloco de condicional **IF**
+
+```php
+<?php
+
+require_once("./src/conexao.php");
+require_once("./src/Model.php");
+require_once("./src/Repository.php");
+
+if (isset($_POST['cadastro'])) {
+    $produto = new Produto(
+        null,
+        $_POST['tipo'],
+        $_POST['nome'],
+        $_POST['descricao'],
+        $_POST['preco'],
+        $_POST['imagem']
+    );
+}
+
+?>
+```
+
+## Incluindo produto no banco
+
