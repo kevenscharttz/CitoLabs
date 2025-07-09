@@ -59,4 +59,15 @@ class ProdutoRepositorio
         $statementDelete->bindValue(1, $id);
         $statementDelete->execute();
     }
+
+    public function salvar($produto) {
+        $sqlCommandSave = "INSERT INTO produtor (tipo, nome, descricao, preco, imagem) VALUES (?, ?, ?, ?, ?);";
+        $statementSave = $this->pdo->prepare($sqlCommandSave);
+        $statementSave->bindValues(1, $produto->tipo);
+        $statementSave->bindValues(2, $produto->nome);
+        $statementSave->bindValues(3, $produto->descricao);
+        $statementSave->bindValues(4, $produto->preco);
+        $statementSave->bindValues(5, $produto->imagem);
+
+    }
 }
