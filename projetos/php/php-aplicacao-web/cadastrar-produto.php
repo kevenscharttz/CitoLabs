@@ -13,7 +13,12 @@ if (isset($_POST['cadastro'])) {
         $_POST['preco'],
         $_POST['imagem']
     );
+    $produtoAdicionado = new ProdutoRepositorio($dbConnection);
+    $produtoAdicionado->salvar($produto);
+    header('Location: ./admin.php');
 }
+
+
 
 ?>
 

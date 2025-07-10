@@ -61,13 +61,13 @@ class ProdutoRepositorio
     }
 
     public function salvar($produto) {
-        $sqlCommandSave = "INSERT INTO produtor (tipo, nome, descricao, preco, imagem) VALUES (?, ?, ?, ?, ?);";
+        $sqlCommandSave = "INSERT INTO produtos (tipo, nome, descricao, preco, imagem) VALUES (?, ?, ?, ?, ?);";
         $statementSave = $this->pdo->prepare($sqlCommandSave);
-        $statementSave->bindValues(1, $produto->tipo);
-        $statementSave->bindValues(2, $produto->nome);
-        $statementSave->bindValues(3, $produto->descricao);
-        $statementSave->bindValues(4, $produto->preco);
-        $statementSave->bindValues(5, $produto->imagem);
-
+        $statementSave->bindValue(1, $produto->getTipo());
+        $statementSave->bindValue(2, $produto->getNome());
+        $statementSave->bindValue(3, $produto->getDescricao());
+        $statementSave->bindValue(4, $produto->getPrecoBruto());
+        $statementSave->bindValue(5, $produto->getImagemBruta());
+        $statementSave->execute();
     }
 }

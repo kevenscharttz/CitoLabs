@@ -8,7 +8,7 @@ class Produto {
     private $imagem;
     private $preco;
 
-    public function __construct($id, $tipo, $nome, $descricao, $preco, $imagem='logo-serenatto.png') {
+    public function __construct($id, $tipo, $nome, $descricao, $preco, $imagem) {
         $this->id = $id;
         $this->tipo = $tipo;
         $this->nome = $nome;
@@ -34,9 +34,19 @@ class Produto {
         return $this->descricao;
     }
 
+    public function getImagemBruta(){
+        return $this->imagem ?: 'logo-serenatto.png';
+    }
+
     public function getImagem(){
         return "./img/" . $this->imagem;
     }
+
+
+    public function getPrecoBruto(){
+        return ($this->preco);    
+    }
+
 
     public function getPreco(){
         return ('R$ ' . number_format($this->preco, 2, ',', '.'));    
