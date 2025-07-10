@@ -56,7 +56,7 @@ $dados = $produtos->opcoes();
               <td><?= $dado->getTipo() ?></td>
               <td> <?= $dado->getDescricao() ?></td>
               <td><?= $dado->getPreco()?></td>
-              <td><a class="botao-editar" href="editar-produto.php">Editar</a></td>
+              <td><a class="botao-editar" href="editar-produto.php?id=<?= $dado->getId(); ?>">Editar</a></td>
               <td>
                 <form action="excluir-produto.php" method="POST">
                   <input type="hidden" name="id" value="<?= $dado->getId()?>">

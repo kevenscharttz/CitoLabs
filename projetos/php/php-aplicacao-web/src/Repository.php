@@ -11,6 +11,18 @@ class ProdutoRepositorio
         $this->pdo = $pdo;
     }
 
+    private function formarObjeto($dados)
+    {
+        return new Produto($dados['id'],
+            $dados['tipo'],
+            $dados['nome'],
+            $dados['descricao'],
+            $dados['preco'],
+            $dados['imagem']
+        );
+    }
+
+
     public function opcoesCafe()
     {
         $sqlCommand = "SELECT * FROM produtos WHERE tipo = 'café' ORDER BY preco ASC;";
@@ -69,5 +81,27 @@ class ProdutoRepositorio
         $statementSave->bindValue(4, $produto->getPrecoBruto());
         $statementSave->bindValue(5, $produto->getImagemBruta());
         $statementSave->execute();
+    }
+
+    public function buscar ($id) {
+        $sqlCommandBuscar = "SELECT * FROM produtos WHERE id = ?";
+        $statementCommandBuscar = $this->pdo->prepare($sqlCommandBuscar);
+        $statementCommandBuscar->bindValue (1, $id);
+        $statementCommandBuscar->execute();
+
+        $dados = $statementCommandBuscar->fetch(PDO::FETCH_ASSOC);
+        return $this->formarObjeto($dados);
+    }
+
+    public function editar ($produto) {
+        $sqlCommandEditar = "UPDATE produtos SET tipo = ?, nome = ?, descricao= ?, preco = ?, imagem = ? WHERE id = ?";
+        $statementCommandEditar = $this->pdo->prepare($sqlCommandEditar);
+        $statementCommandEditar -> bindValue (1, $produto->getTipo());
+        $statementCommandEditar -> bindValue (2, $produto->getNome());
+        $statementCommandEditar -> bindValue (3, $produto->getDescricao());
+        $statementCommandEditar -> bindValue (4, $produto->getPrecoBruto());
+        $statementCommandEditar -> bindValue (5, $produto->getImagemBruta());
+        $statementCommandEditar -> bindValue (6, $produto->getID());
+        $statementCommandEditar -> execute();
     }
 }
