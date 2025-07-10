@@ -201,3 +201,87 @@ if (isset($_POST['cadastro'])) {
 
 ## Incluindo produto no banco
 
+Com a criação do objeto feita, agora nós podemos adiciona-lo ao banco, o que é bem simples para falar a verdade. No nosso arquivo **Repository**, dentro da classe **ProdutoRepositorio** nós acrescentamos o método **salvar** passando como parâmetro o objeto criado. Dentro do método nós incluímos o código **SQL** com **?** no lugar dos values, onde os dados que vamos obter serão colocados. Depois com um **statement**, preparamos esse código **SQL**, e fazemos seus **bindValues**, passando cada uma das informações trazidas via getters do **MODEL.php**, por fim, usamos o método **execute**, para toda essa preparação ser executada.
+
+```php
+    public function salvar($produto) {
+        $sqlCommandSave = "INSERT INTO produtos (tipo, nome, descricao, preco, imagem) VALUES (?, ?, ?, ?, ?);";
+        $statementSave = $this->pdo->prepare($sqlCommandSave);
+        $statementSave->bindValue(1, $produto->getTipo());
+        $statementSave->bindValue(2, $produto->getNome());
+        $statementSave->bindValue(3, $produto->getDescricao());
+        $statementSave->bindValue(4, $produto->getPrecoBruto());
+        $statementSave->bindValue(5, $produto->getImagem());
+        $statementSave->execute();
+    }
+```
+
+No fim, basta instanciarmos um novo objeto de **ProdutoRepositorio**, passando a conexão com o **PDO** como parâmetro e chamando em seguida o método **salvar**, passando o produto criado.
+
+```php
+$produtoAdicionado = new ProdutoRepositorio($dbConnection);
+$produtoAdicionado->salvar($produto);
+header('Location: ./admin.php');
+```
+
+## Editando um produto
+
+Primeiro para editarmos os dados de um produto, é necessário termos acesso aos dados já existentes desse produto, e o método mais fácil de pesquisa é através de seu id. No botão de edição na tela de **admin**, foi alterado a **href** para que referenciasse também ao **id** daquele usuário em especifico. Já na tela de **Repository**, dentro da classe **ProdutoRepositorio** preparamos o método **buscar** que cria um comando **SQL**, para obter os dados do produto que ter determinado **ID**, e depois executa-o, salvando posteriormente em uma variável para utilizar o método **fetch(PDO::FETCH_ASSOC)**, e depois retornando esses dados para o método **FormarObjeto**, passando esses dados como parâmetro para formar um objeto.
+
+```php
+    public function buscar ($id) {
+        $sqlCommandBuscar = "SELECT * FROM produtos WHERE id = ?";
+        $statementCommandBuscar = $this->pdo->prepare($sqlCommandBuscar);
+        $statementCommandBuscar->bindValue (1, $id);
+        $statementCommandBuscar->execute();
+
+        $dados = $statementCommandBuscar->fetch(PDO::FETCH_ASSOC);
+        return $this->formarObjeto($dados);
+    }
+```
+
+Na tela de edição, agora, podemos criar uma nova instancia de **ProdutoRepositorio**, para utilizar seu método através de uma nova variável, para executar essa buscar através do **ID** obtido pelo **$_GET**_, apenas incluindo esses dados dinâmicos nos **value** dos inputs.
+
+```php
+$produtoRepositorio = new ProdutoRepositorio($dbConnection);
+$produto = $produtoRepositorio->buscar($_GET['id']);
+```
+
+Mas como podemos de fato fazer essa alteração? Porque até o momento apenas sincronizando as informações e as trazendo para a tela de edição. Não é muito diferente de como nós fizemos a adição de produtos, primeiro precisamos incluir um novo método na classe **ProdutoRepositorio**, onde terá uma novo código **SQL** para a atualização das informações, nada muito diferente do que já foi visto.
+
+```php
+public function editar ($produto) {
+        $sqlCommandEditar = "UPDATE produtos SET tipo = ?, nome = ?, descricao= ?, preco = ?, imagem = ? WHERE id = ?";
+        $statementCommandEditar = $this->pdo->prepare($sqlCommandEditar);
+        $statementCommandEditar -> bindValue (1, $produto->getTipo());
+        $statementCommandEditar -> bindValue (2, $produto->getNome());
+        $statementCommandEditar -> bindValue (3, $produto->getDescricao());
+        $statementCommandEditar -> bindValue (4, $produto->getPrecoBruto());
+        $statementCommandEditar -> bindValue (5, $produto->getImagemBruta());
+        $statementCommandEditar -> bindValue (6, $produto->getID());
+        $statementCommandEditar -> execute();
+    }
+```
+
+Com isso feito, para atualizar esses dados, vamos precisar criar um objeto na tela de **editar-produto**, onde obtemos os dados através de um método **POST**, fazendo uma ligação com o banco e depois chamando o método de edição para de fato substituir os dados obtidos com o método de **busca**. Como falado anteriormente, foram colocados **values** dinâmicos no formulário para termos uma visualização dos dados que pretendemos substituir, mas além disso, vamos precisar incluir um novo input nessa tela, para que possamos obter o **ID**, para que a edição ocorra corretamente ```<input type="hidden" name="id" value="<?= $produto->getId()?>">``` e incluímos uma condicional **ELSE**, para que caso não exista dados no **POST**, seja procurado esses dados:
+
+```PHP
+if (isset($_POST['editar'])) {
+    $produto = new Produto(
+        $_POST['id'],
+        $_POST['tipo'],
+        $_POST['nome'],
+        $_POST['descricao'],
+        $_POST['preco'],
+        $_POST['imagem']
+    );
+    $produtoEditar = new ProdutoRepositorio($dbConnection);
+    $produtoEditar->editar($produto);
+    header('Location: ./admin.php');
+} else {
+    $produto = $produtoRepositorio->buscar($_GET['id']);
+}
+```
+
+
+##
