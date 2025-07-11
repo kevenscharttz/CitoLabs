@@ -284,4 +284,37 @@ if (isset($_POST['editar'])) {
 ```
 
 
-##
+## Trabalhando com imagens
+
+Até o momento nosso formulário parece já estar completo, porém ainda precisamos fazer algo, o envio de imagens ainda não é possível, nem adicionar e nem editar a imagem.  Vamos começar modificando o script que adiciona os produtos, e primeiro precisamos melhor o formulário para que seja possível o envio de algo mais do que apenas textos, incluindo o atributo **enctype="multipart/form-data"**
+
+Mas você pode ser perguntar, para onde essa imagem vai? Existe alguma superglogal que a armazena? A resposta é sim, existe, e quando usamos **var_dump**, conseguimos ver que nos é retornado um array associativo, com alguns dados como: **name** que se trata do nome da imagem, o **type** que indica o tipo de arquivo, o **tmp_name** que se trata do local temporário em que o arquivo fica quando é enviado através do formulário, o **error**, que indica valores diferentes de 0 quando há erros e por fim o **size**, que indica o tamanho do arquivo:
+
+```php
+array(1){
+    ["imagem"]=>
+    array(6) {
+      ["name"]=>
+        string(8) "café.jpg"
+        "full+patch"]=>
+        string(8) "café.jpg"
+        ["type"]=>
+        string(10) "image/jpg"
+        ["tmp_name"]=>
+        string(45) "C:\Users\Alura\AppData\Local\Temp\phpB6E.tmp"
+        ["error"]=>
+        int(0)
+        ["size"]=>
+        int(401623)
+    }
+}
+```
+
+Com essas informações, podemos fazer o seguinte: Caso exista dados sendo enviados dentro da super global **FILES**, podemos usar **Setters** para gravar o nome dessa imagem e, posteriormente, usando o método **move_uploaded_file**, podemos mover essa imagem, mas como isso é possivel? Esse método espera 2 parâmetros, o local onde a imagem está, que no nosso caso podemos obter usando o **tmp_name**, e o segundo parâmetro o local onde queremos que a imagem fique, no contexto do trabalho, podemos usar o método **getImagemDiretorio()**. E pronto, nossa imagem está configurada para ser enviada quando adicionamos um novo produto:
+
+```php
+if (isset($_FILES)){ 
+            $produto->setImagem($_FILES['imagem']['name']);
+            move_uploaded_file($_FILES['imagem']['tmp_name'], $produto->getImagemDiretorio());
+        }
+```
