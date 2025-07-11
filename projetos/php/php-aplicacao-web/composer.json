@@ -1,5 +1,9 @@
 {
     "require": {
-        "dompdf/dompdf": "^3.1"
+        "dompdf/dompdf": "^3.1",
+        "symfony/polyfill-mbstring": "^1.32",
+        "dompdf/php-font-lib": "^1.0",
+        "dompdf/php-svg-lib": "^1.0",
+        "masterminds/html5": "^2.9"
     }
 }
