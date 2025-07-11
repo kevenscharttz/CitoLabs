@@ -1,22 +1,20 @@
 <?php
-require_once("./src/conexao.php");
-require_once("./src/Model.php");
-require_once("./src/Repository.php");
+    require "src/conexao-bd.php";
+    require "src/Modelo/Produto.php";
+    require "src/Repositorio/ProdutoRepositorio.php";
 
-$produtos = new ProdutoRepositorio($dbConnection);
+    $produtoRepositorio = new ProdutoRepositorio($pdo);
+    $produtos = $produtoRepositorio->buscarTodos();
 
-$dados = $produtos->opcoes();
 
 ?>
 
-
 <!doctype html>
 <html lang="pt-br">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport"
-    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/index.css">
@@ -28,51 +26,51 @@ $dados = $produtos->opcoes();
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Serenatto - Admin</title>
 </head>
-
 <body>
-  <main>
-    <section class="container-admin-banner">
-      <img src="img/logo-serenatto-horizontal.png" class="logo-admin" alt="logo-serenatto">
-      <h1>Admistração Serenatto</h1>
-      <img class="ornaments" src="img/ornaments-coffee.png" alt="ornaments">
-    </section>
-    <h2>Lista de Produtos</h2>
+<main>
+  <section class="container-admin-banner">
+    <img src="img/logo-serenatto-horizontal.png" class="logo-admin" alt="logo-serenatto">
+    <h1>Admistração Serenatto</h1>
+    <img class= "ornaments" src="img/ornaments-coffee.png" alt="ornaments">
+  </section>
+  <h2>Lista de Produtos</h2>
 
-    <section class="container-table">
-      <table>
-        <thead>
+  <section class="container-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Tipo</th>
+          <th>Descricão</th>
+          <th>Valor</th>
+          <th colspan="2">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+      <?php foreach ($produtos as $produto): ?>
           <tr>
-            <th>Produto</th>
-            <th>Tipo</th>
-            <th>Descricão</th>
-            <th>Valor</th>
-            <th colspan="2">Ação</th>
+            <td><?= $produto->getNome() ?></td>
+            <td><?= $produto->getTipo() ?></td>
+            <td><?= $produto->getDescricao() ?></td>
+            <td><?= $produto->getPrecoFormatado() ?></td>
+            <td><a class="botao-editar" href="editar-produto.html">Editar</a></td>
+            <td>
+              <form action="excluir-produto.php" method="post">
+                  <input type="hidden" name="id" value="<?= $produto->getId() ?>">
+                <input type="submit" class="botao-excluir" value="Excluir">
+              </form>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($dados as $dado): ?>
-            <tr>
-              <td><?= $dado->getNome() ?></td>
-              <td><?= $dado->getTipo() ?></td>
-              <td> <?= $dado->getDescricao() ?></td>
-              <td><?= $dado->getPreco()?></td>
-              <td><a class="botao-editar" href="editar-produto.php?id=<?= $dado->getId(); ?>">Editar</a></td>
-              <td>
-                <form action="excluir-produto.php" method="POST">
-                  <input type="hidden" name="id" value="<?= $dado->getId()?>">
-                  <input type="submit" class="botao-excluir" value="Excluir">
-                </form>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-      <a class="botao-cadastrar" href="cadastrar-produto.php">Cadastrar produto</a>
-      <form action="#" method="post">
-        <input type="submit" class="botao-cadastrar" value="Baixar Relatório" />
-      </form>
-    </section>
-  </main>
-</body>
+      <?php endforeach; ?>
 
+
+      </tbody>
+    </table>
+  <a class="botao-cadastrar" href="cadastrar-produto.php">Cadastrar produto</a>
+  <form action="#" method="post">
+    <input type="submit" class="botao-cadastrar" value="Baixar Relatório"/>
+  </form>
+  </section>
+</main>
+</body>
 </html>

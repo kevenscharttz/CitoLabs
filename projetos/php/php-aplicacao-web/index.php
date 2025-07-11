@@ -1,22 +1,23 @@
 <?php
 
-require_once('./src/conexao.php');
-require_once('./src/Model.php');
-require_once('./src/Repository.php');
+    require "src/conexao-bd.php";
+    require "src/Modelo/Produto.php";
+    require "src/Repositorio/ProdutoRepositorio.php";
 
-$produtosRepositorio = new ProdutoRepositorio($dbConnection);
-$dadosCafe = $produtosRepositorio->opcoesCafe();
-$dadosAlmoco = $produtosRepositorio->opcoesAlmoco()
+    $produtosRepositorio = new ProdutoRepositorio($pdo);
+    $dadosCafe = $produtosRepositorio->opcoesCafe();
+    $dadosAlmoco = $produtosRepositorio->opcoesAlmoco();
+
+
 
 ?>
 
 <!doctype html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/index.css">
@@ -27,7 +28,6 @@ $dadosAlmoco = $produtosRepositorio->opcoesAlmoco()
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>Serenatto - Cardápio</title>
 </head>
-
 <body>
     <main>
         <section class="container-banner">
@@ -39,20 +39,17 @@ $dadosAlmoco = $produtosRepositorio->opcoesAlmoco()
         <section class="container-cafe-manha">
             <div class="container-cafe-manha-titulo">
                 <h3>Opções para o Café</h3>
-                <img class="ornaments" src="img/ornaments-coffee.png" alt="ornaments">
+                <img class= "ornaments" src="img/ornaments-coffee.png" alt="ornaments">
             </div>
             <div class="container-cafe-manha-produtos">
-                <?php
-                foreach ($dadosCafe as $cafe):
-                ?>
-
+                <?php foreach ($dadosCafe as $cafe):?>
                     <div class="container-produto">
                         <div class="container-foto">
-                            <img src="<?= $cafe->getImagem() ?>">
+                            <img src="<?= $cafe->getImagemDiretorio() ?>">
                         </div>
-                        <p><?= $cafe->getNome(); ?></p>
-                        <p><?= $cafe->getDescricao(); ?></p>
-                        <p><?= $cafe->getPreco() ?></p>
+                        <p><?= $cafe->getNome()?></p>
+                        <p><?= $cafe->getDescricao()?></p>
+                        <p><?= $cafe->getPrecoFormatado() ?></p>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -60,22 +57,22 @@ $dadosAlmoco = $produtosRepositorio->opcoesAlmoco()
         <section class="container-almoco">
             <div class="container-almoco-titulo">
                 <h3>Opções para o Almoço</h3>
-                <img class="ornaments" src="img/ornaments-coffee.png" alt="ornaments">
+                <img class= "ornaments" src="img/ornaments-coffee.png" alt="ornaments">
             </div>
             <div class="container-almoco-produtos">
-                <?php foreach ($dadosAlmoco as $almoco): ?>
+                <?php foreach ($dadosAlmoco as $almoco):?>
                     <div class="container-produto">
                         <div class="container-foto">
-                            <img src="<?= $almoco->getImagem() ?>">
+                            <img src="<?= $almoco->getImagemDiretorio()?>">
                         </div>
-                        <p><?= $almoco->getNome() ?></p>
-                        <p><?= $almoco->getDescricao() ?></p>
-                        <p><?= $almoco->getPreco() ?></p>
+                        <p><?= $almoco->getNome()?></p>
+                        <p><?= $almoco->getDescricao()?></p>
+                        <p><?= $almoco->getPrecoFormatado() ?></p>
                     </div>
                 <?php endforeach; ?>
             </div>
+
         </section>
     </main>
 </body>
-
 </html>

@@ -1,12 +1,10 @@
-<?php 
+<?php
 
-require_once("./src/conexao.php");
-require_once("./src/Model.php");
-require_once("./src/Repository.php");
+require "src/conexao-bd.php";
+require "src/Modelo/Produto.php";
+require "src/Repositorio/ProdutoRepositorio.php";
 
-$id = $_POST['id'];
+$produtoRepositorio = new ProdutoRepositorio($pdo);
+$produtoRepositorio->deletar($_POST['id']);
 
-$delete = new ProdutoRepositorio($dbConnection);
-$delete->deletar($id);
-header("Location: ./admin.php");
-?>
+header("Location: admin.php");
