@@ -49,7 +49,7 @@ Para inserirmos um vídeo de fato no site via PHP, primeiro precisamos refinar o
 <form class="container__formulario" action="./new-video.php" method="post">
 ```
 
-Agora, por escolha antecipada minha, decidi criar uma classe separada para a **conexão com o banco de dados**, para evitar copiar e colar a conexão em **múltiplos arquivos**. Assim, sem a necessidade de repetir a ligação com o banco, criei o script **PHP _new-video_**, onde importei a conexão com o banco, armazenei os dados enviados pelo formulário em variáveis via método **POST**, defini uma variável com o comando **SQL** de inserção, preparei esse comando através do **statement**, fiz os respectivos **bindValue()** dos dados e, finalmente, executei o comando com **execute()**. Por fim, utilizei o **header()** para redirecionar o usuário para a tela principal.
+Agora, por escolha antecipada minha, decidi criar uma classe separada para a **conexão com o banco de dados**, para evitar copiar e colar a conexão em **múltiplos arquivos**. Assim, sem a necessidade de repetir a ligação com o banco, criei o script **PHP _new-video_**, onde importei a conexão com o banco, armazenei os dados enviados pelo formulário em variáveis via método **POST**, defini uma variável com o comando **SQL** de inserção, preparei esse comando através do **statement**, fiz os respectivos **bindValue()** dos dados e, finalmente, executei o comando com **execute()**.
 
 ```php
 <?php
@@ -67,7 +67,7 @@ $statement->bindValue(1, $url);
 $statement->bindValue(2, $title);
 
 $statement->execute();
-
-header("Location: ./index.php");
-
 ```
+
+## Realizando a busca
+
