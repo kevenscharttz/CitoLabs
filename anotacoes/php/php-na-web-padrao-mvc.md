@@ -21,20 +21,53 @@ O navegador faz uma requisição (_request_) para o servidor, então o servidor 
 
 ## Criando um banco
 
-O tipo de banco escolhido foi o **sqlite**, um banco que é gerado nos próprios arquivos do código. Onde nos passamos o local onde ele ficará, juntamente com seu nome, criamos um novo objeto do tipo **PDO** com esse caminho, e depois executamos um script **sql**:
+O tipo de banco escolhido foi o **PostgreSQL**, um sistema de banco de dados **relacional** robusto que funciona em um servidor separado. Para utilizá-lo, informamos o **endereço** do servidor, a **porta**, o **nome do banco**, **usuário** e **senha** na criação do objeto **PDO**, e depois executamos um script **SQL** para criar as tabelas e manipular os dados:
 
-``` php
+```php
 <?php
-	$dbPath = __DIR__ . '/banco.sqlite';
-	$pdo = new PDO("sqlite:$dbPath");
-	$pdo->exec('CREATE TABLE videos (id INTEGER PRIMARY KEY, url TEXT, title TEXT);');
+
+$host = 'localhost';
+$port = '5432';
+$dbname = 'aluraplay';
+
+$user = 'postgres';
+$password = '12345';
+
+$pdo = new PDO("pgsql:host=$host; port=$port; dbname=$dbname", $user, $password);
+
+$sql = "CREATE TABLE videos(id SERIAL PRIMARY KEY, url VARCHAR(100), title VARCHAR(50))";
+$pdo->exec($sql);
+
 ?>
 ```
 
 ## Inserindo um vídeo
 
-Para inserirmos um vídeo de fato no site via PHP, primeiro precisamos refinar o nosso arquivo **enviar-video.php**, na tag **form**, onde nós temos o nosso formulário, vamos passar dois parâmetros, um chamado **action** que serve para definir o local para onde estamos enviando nossos dados preenchidos no formulário, e o segundo é o **method**, onde definimos o método que estamos usando, sendo o **POST**, pois quando usamos o **GET**, estamos enviando os dados via URL, o que é menos seguro. Porém deixando claro que, no **POST** os dados também ficam visíveis, porém o método para visualizarmos é mais complicado: 
+Para inserirmos um vídeo de fato no site via PHP, primeiro precisamos refinar o nosso arquivo **enviar-video.html**, na tag **form**, onde nós temos o nosso formulário, vamos passar dois parâmetros, um chamado **action** que serve para definir o local para onde estamos enviando nossos dados preenchidos no formulário, e o segundo é o **method**, onde definimos o método que estamos usando, sendo o **POST**, pois quando usamos o **GET**, estamos enviando os dados via URL, o que é pode ser considerado menos seguro e menos eficiente, pois existe um limite de caracteres em uma URL. Porém deixando claro que, no **POST** os dados também ficam visíveis, porém o método para visualizarmos é mais complicado: 
 
 ```php
-<form class="container__formulario" action="./novo-video.php" method="post">
+<form class="container__formulario" action="./new-video.php" method="post">
+```
+
+Agora, por escolha antecipada minha, decidi criar uma classe separada para a **conexão com o banco de dados**, para evitar copiar e colar a conexão em **múltiplos arquivos**. Assim, sem a necessidade de repetir a ligação com o banco, criei o script **PHP _new-video_**, onde importei a conexão com o banco, armazenei os dados enviados pelo formulário em variáveis via método **POST**, defini uma variável com o comando **SQL** de inserção, preparei esse comando através do **statement**, fiz os respectivos **bindValue()** dos dados e, finalmente, executei o comando com **execute()**. Por fim, utilizei o **header()** para redirecionar o usuário para a tela principal.
+
+```php
+<?php
+
+require "./connection.php";
+
+$url = $_POST['url'];
+$title = $_POST['titulo'];
+
+$sql = "INSERT INTO videos (url, title) VALUES (?, ?)";
+
+$statement = $pdo->prepare($sql);
+
+$statement->bindValue(1, $url);
+$statement->bindValue(2, $title);
+
+$statement->execute();
+
+header("Location: ./index.php");
+
 ```
