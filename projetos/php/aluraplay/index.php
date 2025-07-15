@@ -2,19 +2,19 @@
 
 if (strpos($_SERVER['REQUEST_URI'], 'sucesso=0')) {
     echo "<script type='text/javascript'>
-        alert('Não foi possível realizar a ação');
+        alert('Não foi possível adicionar o vídeo');
     </script>";
-} else
+}
 
-    require "./connection.php";
+require "./connection.php";
 
 $sql = "SELECT * FROM videos;";
 
 $statement = $pdo->query($sql);
 $videosList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -31,7 +31,9 @@ $videosList = $statement->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
+
     <header>
+
         <nav class="cabecalho">
             <a class="logo" href="./index.html"></a>
 
@@ -40,29 +42,27 @@ $videosList = $statement->fetchAll(PDO::FETCH_ASSOC);
                 <a href="./pages/login.html" class="cabecalho__sair">Sair</a>
             </div>
         </nav>
+
     </header>
 
     <ul class="videos__container" alt="videos alura">
         <?php foreach ($videosList as $video): ?>
-            <?php if (!str_starts_with($video['url'], 'http')) {
-                $video['url'] = "https://www.youtube.com/embed/d_VinJe8mfQ?si=B2uKbqwRoQki2bzu";
-                $video['title'] = "
-Conheça o canal do YouTube da Alura";
-            } ?>
-            <li class="videos__item">
-                <iframe width="100%" height="72%" src="<?= $video['url'] ?>"
-                    title="YouTube video player" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen></iframe>
-                <div class="descricao-video">
-                    <img src="./img/logo.png" alt="logo canal alura">
-                    <h3><?= $video['title'] ?></h3>
-                    <div class="acoes-video">
-                        <a href="./pages/enviar-video.html">Editar</a>
-                        <a href="./remove-video.php?id=<?= $video['id'] ?>">Excluir</a>
+            <?php if (str_starts_with($video['url'], 'http')) : ?>
+                <li class="videos__item">
+                    <iframe width="100%" height="72%" src="<?= $video['url'] ?>"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                    <div class="descricao-video">
+                        <img src="./img/logo.png" alt="logo canal alura">
+                        <h3><?= $video['title'] ?></h3>
+                        <div class="acoes-video">
+                            <a href="./pages/enviar-video.html">Editar</a>
+                            <a href="./pages/enviar-video.html">Excluir</a>
+                        </div>
                     </div>
-                </div>
-            </li>
+                </li>
+            <?php endif; ?>
         <?php endforeach; ?>
     </ul>
 </body>
