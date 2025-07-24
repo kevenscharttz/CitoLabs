@@ -2,8 +2,15 @@
 
 require_once "./connection.php";
 
-$title = $_POST['title'];
-$url = $_POST['url'];
+
+$url = filter_input(INPUT_POST, 'url', FILTER_VALIDATE_URL);
+
+if ('url' === false) {
+    header('Location: /index.php?sucesso=0');
+    exit;
+}
+
+$title = filter_input(INPUT_POST, 'title');
 
 $sql = "INSERT INTO videos (url, title) VALUES (:url, :title)";
 

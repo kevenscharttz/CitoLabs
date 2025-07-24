@@ -71,3 +71,78 @@ $statement->execute();
 
 ## Realizando a busca
 
+Antes de mais nada, existe um problema no nosso código que é o fato do usuário atualizar a página, e o dado ser enviado mais uma vez para o banco, gerando duplicidade de dados. Como solução para desse problema bastante comum na web, usaremos o **padrão Post\Redirect\Get**.
+
+### **Padrão Post\Redirect\Get**
+
+Ao receber uma requisição com o verbo **POST**, após executar a ação, vamos redirecionar a pessoa usuária para outra página, utilizando o método **GET**. Dessa forma, ela poderá atualizar quantas vezes quiser e o comportamento não mudará.
+Há um cabeçalho HTTP chamado **LOCATION**, quando o servidor o envia, o navegador sabe que deve redirecionar a pessoa. Como o **PHP** foi feito para web, esse processo também será bem simples - basta chamar a função **header( )**.
+
+```php
+<?php
+
+require_once "./connection.php";
+
+$title = $_POST['title'];
+$url = $_POST['url'];
+
+$sql = "INSERT INTO videos (url, title) VALUES (:url, :title)";
+
+$statement = $pdo->prepare($sql);
+$statement->bindValue(":url", $url);
+$statement->bindValue(":title", $title);
+
+
+if ($statement->execute() === false) {
+    header('Location: ./index.php?sucesso=0');
+    exit;
+} else {
+    header('Location: ./index.php?sucesso=1');
+    exit;
+}
+
+```
+
+## Realizando a exclusão
+
+Para a exclusão dos dados, é necessário modificarmos o nosso form um pouco. No botão de excluir, vamos alterar o caminho de envio, para que seja enviado para o novo arquivo php de exclusão, com o id do vídeo na **URL**:
+
+```php
+<a href="./remove-video.php?id=<?= $video['id'] ?>">Excluir</a>
+```
+
+No remove-video podemos coletar o id que foi passado pelo método **GET**, criamos o comando **SQL** de exclusão e depois podemos começar a preparar esse comando, usando a função **ValueBind( )** para incluir o id no comando e depois executar:
+
+```php
+<?php 
+
+require_once("./connection.php");
+
+$id = $_GET['id'];
+$sql = 'DELETE FROM videos WHERE id = :id';
+
+$statement = $pdo->prepare($sql);
+$statement->bindValue(":id", $id);
+
+if ($statement->execute() === false) {
+    header('Location: ./index.php?sucesso=0');
+} else {
+    header('Location: ./index.php?sucesso=1');
+}
+?>
+```
+
+## Filter_input ( )
+
+Ao invés de acessar diretamente o POST, no **new_video**, agora iremos usar uma função chamada **filter_input**, ela traz um dado de um input, de algo que veio por uma requisicação, e logo em seguida será filtrado/validado por alguma regra:
+
+```php
+$url = filter_input(INPUT_POST, 'url', FILTER_VALIDATE_URL);
+
+if ('url' === false) {
+    header('Location: /index.php?sucesso=0');
+    exit;
+}
+
+$title = filter_input(INPUT_POST, 'title');
+```
