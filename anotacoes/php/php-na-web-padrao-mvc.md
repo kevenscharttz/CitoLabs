@@ -146,3 +146,6 @@ if ('url' === false) {
 
 $title = filter_input(INPUT_POST, 'title');
 ```
+
+## Editando o vídeo
+

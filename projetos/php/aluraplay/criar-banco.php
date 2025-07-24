@@ -1,8 +1,4 @@
 <?php
 
 require_once "./connection.php";
-
-$createTable = "CREATE TABLE videos(id SERIAL PRIMARY KEY, url VARCHAR(100), title VARCHAR(50))";
-$pdo->exec($createTable);
-
-?>
+$pdo->exec('CREATE TABLE videos (id INTEGER PRIMARY KEY, url TEXT, title TEXT);');
