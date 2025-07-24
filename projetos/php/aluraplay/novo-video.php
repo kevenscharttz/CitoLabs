@@ -1,26 +1,8 @@
 <?php
 
-require_once "./connection.php";
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-$url = filter_input(INPUT_POST, 'url', FILTER_VALIDATE_URL);
-if ($url === false) {
-    header('Location: /index.php?sucesso=0');
-    exit();
-}
-$titulo = filter_input(INPUT_POST, 'titulo');
-if ($titulo === false) {
-    header('Location: /index.php?sucesso=0');
-    exit();
-}
-
-$sql = 'INSERT INTO videos (url, title) VALUES (?, ?)';
-$statement = $pdo->prepare($sql);
-$statement->bindValue(1, $url);
-$statement->bindValue(2, $titulo);
-
-if ($statement->execute() === false) {
-    header('Location: /index.php?sucesso=0');
-} else {
-    header('Location: /index.php?sucesso=1');
-}
+var_dump($_POST);
+exit;
 

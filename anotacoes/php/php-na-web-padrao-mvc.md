@@ -147,5 +147,7 @@ if ('url' === false) {
 $title = filter_input(INPUT_POST, 'title');
 ```
 
-## Editando o vídeo
+## Limpando o código
+
+Nessa parte, iremos passar por nossos arquivos para melhorar um pouco o nosso código geral, começando por excluir o arquivo de criação da tabela de video. Outra coisa são os aquivos de formulario e de listagem de videos, que tem um inicio e fim do html iguais. Foi criado dois arquivos de inicio e fim desse html e feito um require.
 
