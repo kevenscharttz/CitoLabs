@@ -186,3 +186,9 @@ if (!array_key_exists('PATH_INFO', $_SERVER) || $_SERVER['PATH_INFO'] === '/') {
 	require_once 'remover-video.php';
 }
 ```
+
+## Limpando o código
+
+Nesse momento vamos passar pelos arquivos e vamos analisa-los para ver o que podemos melhorar nesse primeiro momento. A principio há várias melhorias que podemos fazer no código, mas iremos focar nisso em outro momento.
+
+Por agora, podemos visualizar que o começo do html  quanto o final tanto do arquivo de **formulario** e de **listagem-videos** é igual, ou seja, podemos fazer arquivos separados e apenas realizar uma requisição disso.
