@@ -149,3 +149,40 @@ $title = filter_input(INPUT_POST, 'title');
 
 ## Editando o vídeo
 
+## Por que centralizar
+
+Em uma aplicação mais bem-estruturada, a prática de repetição de código seria inconcebível! Nosso projeto ainda é relativamente pequeno e simples, mas imagine como essa prática seria problemática em um sistema grande! Teríamos que copiar a conexão com o banco de dados, a conexão com outros sistemas, configurações de como nosso sistema roda, variáveis que dependem do ambiente, entre outros recursos.
+
+Existem muitas coisas que podemos centralizar, como configurações, detalhes de conexão e dependências do projeto. Há muitas ações que realizaremos em todas as requisições e não é nada prático repetir código em todos os arquivos. O que é normalmente feito em aplicações PHP é ter um arquivo em que deixamos a **inicialização da aplicação.** 
+
+Esse arquivo não incluirá nenhuma regra de negócio, como verificar se um parâmetro é inteiro ou buscar dados no banco com um filtro específico. A inicialização consistirá em processos como carregar arquivos de configurações, configurar as dependências do nosso sistema, verificar qual URL foi acessada e chamar o arquivo correspondente. Ou seja, ele inicializa a aplicação e não executa nada por conta própria, mas chama outros arquivos para serem executados. É essa prática que implementaremos a seguir, e o nome dela é **_front-controller_**.
+
+## Front-controller
+
+Um _front-controller_ é um controlador que fica à frente de tudo, controlando tudo que entra no sistema. Esse arquivo receberá todas as requisições e redirecioná-las para os arquivos necessários para cada etapa do processo. 
+
+Primeiro foi necessário alterar alguns caminhos no nosso código, por exemplo removendo a extensão **.php** e também porque o nosso antigo index foi alterado para **listagem-videos**, e o novo index servirá para redirecionamento de paǵinas, seguindo nossa ideia de front-controller:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+if (!array_key_exists('PATH_INFO', $_SERVER) || $_SERVER['PATH_INFO'] === '/') {
+    require_once 'listagem-videos.php';
+} elseif ($_SERVER['PATH_INFO'] === '/novo-video') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        require_once 'formulario.php';
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        require_once 'novo-video.php';
+    }
+}  elseif ($_SERVER['PATH_INFO'] === '/editar-video') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        require_once 'formulario.php';
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        require_once 'editar-video.php';
+    }
+} else if ($_SERVER['PATH_INFO'] === '/remover-video') {
+	require_once 'remover-video.php';
+}
+```
