@@ -1,6 +1,6 @@
 <?php
 
-require_once "./connection.php";
+require_once __DIR__ . "/connection.php";
 
 $id = $_GET['id'];
 $sql = 'DELETE FROM videos WHERE id = ?';

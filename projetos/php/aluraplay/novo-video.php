@@ -1,6 +1,6 @@
 <?php
 
-require_once "./connection.php";
+require_once __DIR__ . "/connection.php";
 
 $url = filter_input(INPUT_POST, 'url', FILTER_VALIDATE_URL);
 if ($url === false) {

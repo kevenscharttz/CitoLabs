@@ -1,6 +1,6 @@
 <?php
 
-require_once "./connection.php";
+require_once __DIR__ . "/connection.php";
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $video = [
@@ -15,7 +15,7 @@ if ($id !== false) {
 }
 
 ?>
-<?php require_once "./inicio-html.php" ?>
+<?php require_once __DIR__ . "/inicio-html.php" ?>
 <main class="container">
 
     <form class="container__formulario" method="post">
@@ -44,4 +44,4 @@ if ($id !== false) {
     </form>
 
 </main>
-<?php require_once "./fim-html.php" ?>
+<?php require_once __DIR__ . "/fim-html.php" ?>
