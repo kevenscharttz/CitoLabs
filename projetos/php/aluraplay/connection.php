@@ -5,7 +5,7 @@ $port = '5432';
 $dbname = 'aluraplay';
 
 $user = 'postgres';
-$password = '12345';
+$password = '@cito2025';
 
 $pdo = new PDO("pgsql:host=$host; port=$port; dbname=$dbname", $user, $password);
 

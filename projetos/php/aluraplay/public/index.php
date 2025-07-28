@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 $path = __DIR__;
+require_once $path . '/../vendor/autoload.php';
 
 if (!array_key_exists('PATH_INFO', $_SERVER) || $_SERVER['PATH_INFO'] === '/') {
     require_once $path . '/../listagem-videos.php';
