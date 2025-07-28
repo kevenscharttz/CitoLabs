@@ -1,6 +1,6 @@
 <?php
 
-require_once "./connection.php";
+require_once __DIR__ . "/connection.php";
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $video = [
@@ -15,12 +15,10 @@ if ($id !== false && $id !== null) {
 }
 
 ?>
-<?php require_once 'inicio-html.php' ?>
+<?php require_once __DIR__ . "/inicio-html.php" ?>
 <main class="container">
 
-    <form class="container__formulario"
-        action="<?= $id === false ? '/novo-video' : '/editar-video?id=' . $id; ?>"
-        method="post">
+    <form class="container__formulario" method="post">
         <h2 class="formulario__titulo">Envie um vídeo!</h2>
         <div class="formulario__campo">
             <label class="campo__etiqueta" for="url">Link embed</label>
@@ -46,4 +44,4 @@ if ($id !== false && $id !== null) {
     </form>
 
 </main>
-<?php require_once 'fim-html.php' ?>
+<?php require_once __DIR__ . "/fim-html.php" ?>

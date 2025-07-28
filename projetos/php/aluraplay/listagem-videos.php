@@ -1,13 +1,13 @@
 <?php
 
-require_once "./connection.php";
+require_once __DIR__ . "/connection.php";
 
 $videoList = $pdo->query('SELECT * FROM videos;')->fetchAll(\PDO::FETCH_ASSOC);
 
 ?>
-<?php require_once 'inicio-html.php' ?>
-<ul class="videos__container">
-    <?php foreach ($videoList as $video): ?>
+<?php require_once __DIR__ . '/inicio-html.php';?>
+    <ul class="videos__container">
+        <?php foreach ($videoList as $video): ?>
         <li class="videos__item">
             <iframe width="100%" height="72%" src="<?= $video['url']; ?>"
                 title="YouTube video player" frameborder="0"
@@ -21,6 +21,6 @@ $videoList = $pdo->query('SELECT * FROM videos;')->fetchAll(\PDO::FETCH_ASSOC);
                 </div>
             </div>
         </li>
-    <?php endforeach; ?>
-</ul>
-<?php require_once 'fim-html.php' ?>
+        <?php endforeach; ?>
+    </ul>
+<?php require_once __DIR__ . "/fim-html.php" ?>
