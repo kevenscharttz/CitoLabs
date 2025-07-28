@@ -324,3 +324,85 @@ class VideoRepository {
 ```
 
 Depois disso tudo feito, bastará editar os arquivos para que comecem a trabalhar com objetos.
+
+## Controladores de requisição
+
+O controador de requisição terá um método que processa a requisição. Este processamento, por sua vez, consiste em criar dependêNcias necessárias, receber os dados da requisição e montar a resposta. E para isso, vamos começar com o **listagem-videos.php**
+
+Primeiro criamos uma pasta **Controller**, referente ao controlador de requisições. Nessa subpastam criaremos uma nova classe denominada **VideoListController**. Nessa classe, chamaremos um método que processa as requisições de **processaRequisicao**. Por enquanto, não receberá nenhum parâmetro nem retornará nada, apenas lidará com a requisição e exibirá o nosso HTML ou enviará cabeçalhos HTTP, por exemplo, dependendo do que for necessário.
+
+Agora, precisamos exibir algum arquivo de visualização. Neste caso, poderíamos pegar tudo que está no arquivo `listagem-videos.php`, com exceção do trecho do repositório, e colar em `$videoList`, apagando somente a tag de abertura `<?php>` e de fechamento `?>` respectivamente no início e no fim do código.
+
+Pensando em melhorá-lo ainda mais, ao invés de criar o `PDO`, pegar o `dbPath` e instaciar o repositório, podemos receber este repositório como parâmetro de `--construct` e limpar o construtor, pois passaremos o trecho de código que está nele para a `index`.
+
+```php
+<?php
+
+namespace Alura\Mvc\Controller;
+use \Alura\Mvc\Repository\VideoRepository;
+use PDO;
+
+class VideoListController
+{
+    /**
+     * Recebe o repositório por parâmetro;
+     *
+     * @param VideoRepository $videoRepository
+     */
+    public function __construct(private VideoRepository $videoRepository)
+    {
+
+    }
+
+    /**
+     * lida com a requisição e exibe o html;
+     *
+     * @return void
+     */
+    public function processaRequisicao(): void 
+    {
+        $videoList = $this->videoRepository->all();
+        require_once __DIR__ . '/../../inicio-html.php';
+        ?>
+        <ul class="videos__container">
+            <?php foreach ($videoList as $video): ?>
+            <li class="videos__item">
+                <iframe width="100%" height="72%" src="<?= $video->url ?>"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+                <div class="descricao-video">
+                    <h3><?= $video->title ?></h3>
+                    <div class="acoes-video">
+                        <a href="/editar-video?id=<?= $video->id; ?>">Editar</a>
+                        <a href="/remover-video?id=<?= $video->id; ?>">Excluir</a>
+                    </div>
+                </div>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php require_once __DIR__ . "/../../fim-html.php";
+    }
+}
+
+```
+
+Já no **index.php**, será necessário alterar um pouco o arquivo para que dessa forma, seja possível criar a nossa instancia de **VideoRepository**:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Alura\Mvc\Controller\VideoListController;
+use Alura\Mvc\Repository\VideoRepository;
+$path = __DIR__;
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once $path . '/../connection.php';
+
+$videoRepository = new VideoRepository($pdo);
+
+if (!array_key_exists('PATH_INFO', $_SERVER) || $_SERVER['PATH_INFO'] === '/') {
+    $controller = new VideoListController($videoRepository);
+    $controller->processaRequisicao();
+```

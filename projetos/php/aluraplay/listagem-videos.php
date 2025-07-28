@@ -1,9 +1,5 @@
 <?php
 
-require_once __DIR__ . "/connection.php";
-
-$repository = new \Alura\Mvc\Repository\VideoRepository($pdo);
-$videoList = $repository->all();
 
 ?>
 <?php require_once __DIR__ . '/inicio-html.php';?>
