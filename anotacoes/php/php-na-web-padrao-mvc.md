@@ -194,3 +194,133 @@ if (!array_key_exists('PATH_INFO', $_SERVER) || $_SERVER['PATH_INFO'] === '/') {
 Nesse momento vamos passar pelos arquivos e vamos analisa-los para ver o que podemos melhorar nesse primeiro momento. A principio há várias melhorias que podemos fazer no código, mas iremos focar nisso em outro momento.
 
 Por agora, podemos visualizar que o começo do html  quanto o final tanto do arquivo de **formulario** e de **listagem-videos** é igual, ou seja, podemos fazer arquivos separados e apenas realizar uma requisição disso.
+
+## Organizando a pasta e melhorando o código
+
+Para começarmos com as melhorias no nosso código, é interessante criarmos uma pasta **src**, para começarmos a usar um autolader que faça as buscas, criaremos um **composer.json** configurando esse autoload, e depois usaremos o comando **composer dumpautoload** para criar automaticamente a pasta vendor:
+
+```json
+{
+    "autoload": {
+        "psr-4": {
+            "Alura\\Mvc\\": "src/"
+        }
+    }
+}
+```
+
+Para finalizar essa primeira parte, vamos apenas usar um require no **index.php**, chamando esse autoload. Dentro da pasta **src** criaremos primeiro a pasta **Entity** com o **Video.php**, que será o nosso modelo do vídeo:
+
+```php
+<?php
+namespace Alura\Mvc\Entity;
+
+class Video
+{
+    public readonly int $id;
+    public readonly string $url;
+
+    public function __construct(
+        string $url,
+        public readonly string $title,
+    ) {
+        $this->setUrl($url);
+    }
+
+    private function setUrl(string $url)
+    {
+        if (filter_var($url, FILTER_VALIDATE_URL) == false) {
+            throw new \InvalidArgumentException();
+        }
+
+        $this->url = $url;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+}
+
+```
+
+E também na pasta src, criaremos a pasta de Repository, onde existirá o **VideoRepository**, que conterá nossas funções de adição, remoção, edição, enfim:
+
+```php
+<?php
+
+namespace Alura\Mvc\Repository;
+
+use Alura\Mvc\Entity\Video;
+
+use PDO;
+class VideoRepository {
+    /**
+     * @param PDO $pdo
+     */
+    public function __construct(private PDO $pdo) {
+    }
+
+    /**
+     * @param Video $video
+     * @return bool
+     */
+    public function add(Video $video) : bool {
+        $sql = 'INSERT INTO videos (url, title) VALUES (?, ?)';
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(1, $video->url);
+        $statement->bindValue(2, $video->title);
+
+        $result = $statement->execute();
+        $id = $this->pdo->lastInsertId();
+
+        $video->setId(intval($id));
+
+        return $result;
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function remove(int $id): bool {
+        $sql = 'DELETE FROM videos WHERE id = ?';
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(1, $id);
+
+        return $statement->execute();
+    }
+
+    /**
+     * @param Video $video
+     * @return bool
+     */
+    public function update(Video $video): bool {
+        $sql = 'UPDATE videos SET url = :url, title = :title WHERE id = :id;';
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(':url', $video->url);
+        $statement->bindValue(':title', $video->title);
+        $statement->bindValue(':id', $video->id, PDO::PARAM_INT);
+
+        return $statement->execute();
+    }
+
+    /**
+     * @return Video[]
+     */
+    public function all(): array {
+        $videoList = $this->pdo
+            ->query('SELECT * FROM videos;')
+            ->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(
+            function (array $videoData) {
+                $video = new Video($videoData['url'], $videoData['title']);
+                $video->setId($videoData['id']);
+
+                return $video;
+        }, $videoList);
+    }
+}
+```
+
+Depois disso tudo feito, bastará editar os arquivos para que comecem a trabalhar com objetos.
