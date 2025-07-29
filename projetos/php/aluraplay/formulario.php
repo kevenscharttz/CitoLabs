@@ -7,7 +7,7 @@ $video = [
     'url' => '',
     'title' => '',
 ];
-if ($id !== false) {
+if ($id !== false && $id !== null) {
     $statement = $pdo->prepare('SELECT * FROM videos WHERE id = ?;');
     $statement->bindValue(1, $id, PDO::PARAM_INT);
     $statement->execute();

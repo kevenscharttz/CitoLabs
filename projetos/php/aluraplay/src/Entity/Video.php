@@ -1,44 +1,29 @@
-<?php 
+<?php
+namespace Alura\Mvc\Entity;
 
-namespace Alura\mvc\Entity;
+class Video
+{
+    public readonly int $id;
+    public readonly string $url;
 
-class Video {
-    /**
-     * Construtor objeto vídeo
-     *
-     * @param string $url
-     * @param string $titulo
-     */
     public function __construct(
-        private string $url, 
-        private string $titulo
-    )
+        string $url,
+        public readonly string $title,
+    ) {
+        $this->setUrl($url);
+    }
+
+    private function setUrl(string $url)
     {
+        if (filter_var($url, FILTER_VALIDATE_URL) == false) {
+            throw new \InvalidArgumentException();
+        }
+
         $this->url = $url;
-        $this->titulo = $titulo;
     }
 
-    /**
-     * Método get da URL;
-     *
-     * @return string
-     */
-    public function getUrl(): string
+    public function setId(int $id): void
     {
-        return $this->url;
+        $this->id = $id;
     }
-
-    /**
-     * Método get de titulo
-     *
-     * @return string
-     */
-    public function getTitulo(): string
-    {
-        return $this->titulo;
-    }
-
-
 }
-
-?>

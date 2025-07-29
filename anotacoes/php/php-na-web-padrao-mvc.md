@@ -147,7 +147,9 @@ if ('url' === false) {
 $title = filter_input(INPUT_POST, 'title');
 ```
 
-## Editando o vídeo
+## Limpando o código
+
+Nessa parte, iremos passar por nossos arquivos para melhorar um pouco o nosso código geral, começando por excluir o arquivo de criação da tabela de video. Outra coisa são os aquivos de formulario e de listagem de videos, que tem um inicio e fim do html iguais. Foi criado dois arquivos de inicio e fim desse html e feito um require.
 
 ## Por que centralizar
 
@@ -192,3 +194,215 @@ if (!array_key_exists('PATH_INFO', $_SERVER) || $_SERVER['PATH_INFO'] === '/') {
 Nesse momento vamos passar pelos arquivos e vamos analisa-los para ver o que podemos melhorar nesse primeiro momento. A principio há várias melhorias que podemos fazer no código, mas iremos focar nisso em outro momento.
 
 Por agora, podemos visualizar que o começo do html  quanto o final tanto do arquivo de **formulario** e de **listagem-videos** é igual, ou seja, podemos fazer arquivos separados e apenas realizar uma requisição disso.
+
+## Organizando a pasta e melhorando o código
+
+Para começarmos com as melhorias no nosso código, é interessante criarmos uma pasta **src**, para começarmos a usar um autolader que faça as buscas, criaremos um **composer.json** configurando esse autoload, e depois usaremos o comando **composer dumpautoload** para criar automaticamente a pasta vendor:
+
+```json
+{
+    "autoload": {
+        "psr-4": {
+            "Alura\\Mvc\\": "src/"
+        }
+    }
+}
+```
+
+Para finalizar essa primeira parte, vamos apenas usar um require no **index.php**, chamando esse autoload. Dentro da pasta **src** criaremos primeiro a pasta **Entity** com o **Video.php**, que será o nosso modelo do vídeo:
+
+```php
+<?php
+namespace Alura\Mvc\Entity;
+
+class Video
+{
+    public readonly int $id;
+    public readonly string $url;
+
+    public function __construct(
+        string $url,
+        public readonly string $title,
+    ) {
+        $this->setUrl($url);
+    }
+
+    private function setUrl(string $url)
+    {
+        if (filter_var($url, FILTER_VALIDATE_URL) == false) {
+            throw new \InvalidArgumentException();
+        }
+
+        $this->url = $url;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+}
+
+```
+
+E também na pasta src, criaremos a pasta de Repository, onde existirá o **VideoRepository**, que conterá nossas funções de adição, remoção, edição, enfim:
+
+```php
+<?php
+
+namespace Alura\Mvc\Repository;
+
+use Alura\Mvc\Entity\Video;
+
+use PDO;
+class VideoRepository {
+    /**
+     * @param PDO $pdo
+     */
+    public function __construct(private PDO $pdo) {
+    }
+
+    /**
+     * @param Video $video
+     * @return bool
+     */
+    public function add(Video $video) : bool {
+        $sql = 'INSERT INTO videos (url, title) VALUES (?, ?)';
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(1, $video->url);
+        $statement->bindValue(2, $video->title);
+
+        $result = $statement->execute();
+        $id = $this->pdo->lastInsertId();
+
+        $video->setId(intval($id));
+
+        return $result;
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function remove(int $id): bool {
+        $sql = 'DELETE FROM videos WHERE id = ?';
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(1, $id);
+
+        return $statement->execute();
+    }
+
+    /**
+     * @param Video $video
+     * @return bool
+     */
+    public function update(Video $video): bool {
+        $sql = 'UPDATE videos SET url = :url, title = :title WHERE id = :id;';
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(':url', $video->url);
+        $statement->bindValue(':title', $video->title);
+        $statement->bindValue(':id', $video->id, PDO::PARAM_INT);
+
+        return $statement->execute();
+    }
+
+    /**
+     * @return Video[]
+     */
+    public function all(): array {
+        $videoList = $this->pdo
+            ->query('SELECT * FROM videos;')
+            ->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(
+            function (array $videoData) {
+                $video = new Video($videoData['url'], $videoData['title']);
+                $video->setId($videoData['id']);
+
+                return $video;
+        }, $videoList);
+    }
+}
+```
+
+Depois disso tudo feito, bastará editar os arquivos para que comecem a trabalhar com objetos.
+
+## Controladores de requisição
+
+O controador de requisição terá um método que processa a requisição. Este processamento, por sua vez, consiste em criar dependêNcias necessárias, receber os dados da requisição e montar a resposta. E para isso, vamos começar com o **listagem-videos.php**
+
+Primeiro criamos uma pasta **Controller**, referente ao controlador de requisições. Nessa subpastam criaremos uma nova classe denominada **VideoListController**. Nessa classe, chamaremos um método que processa as requisições de **processaRequisicao**. Por enquanto, não receberá nenhum parâmetro nem retornará nada, apenas lidará com a requisição e exibirá o nosso HTML ou enviará cabeçalhos HTTP, por exemplo, dependendo do que for necessário.
+
+Agora, precisamos exibir algum arquivo de visualização. Neste caso, poderíamos pegar tudo que está no arquivo `listagem-videos.php`, com exceção do trecho do repositório, e colar em `$videoList`, apagando somente a tag de abertura `<?php>` e de fechamento `?>` respectivamente no início e no fim do código.
+
+Pensando em melhorá-lo ainda mais, ao invés de criar o `PDO`, pegar o `dbPath` e instaciar o repositório, podemos receber este repositório como parâmetro de `--construct` e limpar o construtor, pois passaremos o trecho de código que está nele para a `index`.
+
+```php
+<?php
+
+namespace Alura\Mvc\Controller;
+use \Alura\Mvc\Repository\VideoRepository;
+use PDO;
+
+class VideoListController
+{
+    /**
+     * Recebe o repositório por parâmetro;
+     *
+     * @param VideoRepository $videoRepository
+     */
+    public function __construct(private VideoRepository $videoRepository)
+    {
+
+    }
+
+    /**
+     * lida com a requisição e exibe o html;
+     *
+     * @return void
+     */
+    public function processaRequisicao(): void 
+    {
+        $videoList = $this->videoRepository->all();
+        require_once __DIR__ . '/../../inicio-html.php';
+        ?>
+        <ul class="videos__container">
+            <?php foreach ($videoList as $video): ?>
+            <li class="videos__item">
+                <iframe width="100%" height="72%" src="<?= $video->url ?>"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+                <div class="descricao-video">
+                    <h3><?= $video->title ?></h3>
+                    <div class="acoes-video">
+                        <a href="/editar-video?id=<?= $video->id; ?>">Editar</a>
+                        <a href="/remover-video?id=<?= $video->id; ?>">Excluir</a>
+                    </div>
+                </div>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php require_once __DIR__ . "/../../fim-html.php";
+    }
+}
+
+```
+
+Já no **index.php**, será necessário alterar um pouco o arquivo para que dessa forma, seja possível criar a nossa instancia de **VideoRepository**:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Alura\Mvc\Controller\VideoListController;
+use Alura\Mvc\Repository\VideoRepository;
+$path = __DIR__;
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once $path . '/../connection.php';
+
+$videoRepository = new VideoRepository($pdo);
+
+if (!array_key_exists('PATH_INFO', $_SERVER) || $_SERVER['PATH_INFO'] === '/') {
+    $controller = new VideoListController($videoRepository);
+    $controller->processaRequisicao();
+```
