@@ -19,3 +19,16 @@ Dentro da estrutura gerada temos uma série de arquivos e pastas, as principais 
 
 Enfim, muita coisa citada, mas onde exatamente nós vamos trabalhar a principio? Bom, será dentro da pasta **app**.
 
+## Definindo a primeira rota
+
+Agora, vamos executar esse projeto que foi gerado pelo Laravel, para isso, ao invés daquele comando antigo usando **PHP -S**... Vamos utilizar algo um pouco diferente. Vamos utilizar o comando **php artisan**, que é um comando fornecido pelo Laravel, esse comando nos fornece uma gama de funcionalidades muito interessantes, algumas que serão exploradas no treinamento, mas a principio a que vamos utilizar é o que nos possibilita subir um servidor.
+
+Para subir o servidor vamos utilizar: ```php artisan serve```. Com isso, podemos subir um servidor com com hospedagem e porta já especificados, mas claro, caso seja da vontade do usuário especificar isso por si, podemos utilizar esse mesmo comando com alguns parâmetros a mais: ```php artisan --host=0.0.0.0 --port=8080```
+
+Indo de fato para o assunto principal, como nós podemos encontrar o código que é mostrado nesse projeto, abrindo as rotas, vamos encontrar os caminhos dentro do arquivo **web.php**, e seu funcionamento é bastante simples. Utilizando a classe **Route::** seguido do verbo http que eu espero receber a requisição, no nosso caso, como estou acessando direto do navegador, é **GET**, se eu quisesse receber os dados de um formulário, seria **POST**, e em caso de uma **API**, eu posso usar todos os verbos http.
+
+## Auxilio em caso de erros
+
+Imagine que em algum momento do código, acabe por cometer um erro de sintaxe por exemplo, ao tentar acessar o nosso programa vamos ser levados para uma página de erro completamente configurada para ajudar, e muito, nas hora de fazer um debug.
+
+Todos os _frameworks_ fornecem uma página dessa, só que o Laravel dá uma atenção especial para essa página, ele possui um próprio _framework_ de gerenciamento de erros para gerar isso, então ele mostrará exatamente onde está o nosso erro, mas não apenas isso, ele também mostra todas as funções que foram chamadas até o erro acontecer, mostra também a mensagem erro, basicamente ele vai ser nosso amigo para garantir que tudo esteja de acordo.
