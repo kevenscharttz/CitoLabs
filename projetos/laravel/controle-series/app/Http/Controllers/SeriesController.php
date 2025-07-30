@@ -1,10 +1,11 @@
 <?php
 
-namespace app\Http\Controllers;
+namespace App\Http\Controllers;
 
-class SeriesController
+use Illuminate\Http\Request;
+
+class SeriesController extends Controller
 {
-
     public function listarSeries(): void
     {
 
