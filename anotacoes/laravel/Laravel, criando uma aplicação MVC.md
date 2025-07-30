@@ -104,3 +104,19 @@ Por fim, preciso ressaltar que essa é a maneira manual de se criar o controller
 
 ## Convenções de nome
 
+Bom, como citado anteriormente, é possivel se criar uma classe de uma maneira um pouco mais rápida, mas também vamos ver sobre os nomes que vamos utilizar nos métodos dos nossos **controllers**.
+
+Excluindo o arquivo que criei, e indo até o terminal, podemos rodar o ```php artisan```, que vai mostrar uma lista de todos os comando disponíveis, nessa lista, existe um em especifico que é o que nos interessa nesse momento, o **make:controller**, que cria uma nova classe de controller. O comando completo fica da seguinte forma: ```php artisan make:controler nome-da-classe```, e quanto ao nome da classe, no nosso caso será **SeriesController**. Dessa forma o seguinte arquivo será criado: 
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SeriesController extends Controller
+{
+
+}
+```
