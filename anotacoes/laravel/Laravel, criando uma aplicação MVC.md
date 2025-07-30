@@ -170,3 +170,48 @@ Na documentação podemos achar algo como **Resource Controllers**, onde temos:
 | DELETE    | /photos/{photo}      | destruir  | fotos.destruir    |
 
 No nosso caso por exemplo, estamos lidando com uma URL utilizando o **GET**, então o nome do nosso método que exibe essas séries será **index()**.
+
+## Lidando com Request e Response
+
+Quando estamos trabalhando com um **controller**, esperamos uma requisição para devolvermos uma resposta, e com o Laravel podemos fazer exatamente isso. É por esse motivo que quando criamos o **controller** via terminal, essa classe já é importada, porque podemos receber por parâmetro, esse **request**, essa requisição **Request $request**. Dessa forma podemos obter várias informações da requisição, por exemplo, podemos pegar a **URL**, conseguimos pegar detalhes da **query string**, um input que viria de um formulário e etc.
+
+Também podemos retornar uma resposta, e um detalhe interessante é que aqui não estamos retornando nada, estamos exibindo, inclusive se eu tivesse algum erro em algum local, que não seja um erro de sintaxe, acabaríamos vendo o erro, só que a nossa resposta seria exibida por baixo do erro. Então algo que vamos mudar é, não dar mais echos direamente de um **controller**, não vamos fazer isso mais, vamos retornar o html.
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SeriesController extends Controller
+{
+    public function index(): string
+    {
+
+        $series = [
+            'Doctor House',
+            'Breaking Bad',
+            'Flash',
+            'The boys',
+        ];
+
+        $html = '<ul>';
+
+        foreach ($series as $serie) {
+            $html .= "<li>$serie</li>";
+        }
+        return $html .= '</lu>';
+    }
+}
+
+```
+
+
+Vale falar que podemos retornar uma resposta, e o Laravel nos ajuda bastante com esse detalhe de retornar uma resposta, por exemplo, caso eu retorne uma string, o Laravel pega essa string e adiciona no conteúdo da resposta, define um status, manda os cabeçalhos que tem que mandar, etc... Também é possível manipular esses dados, mas não vai ser o nosso caso no momento, vamos deixar da forma que está.
+
+Outra coisa interessante é que caso seja retornado um array por exemplo, é automaticamente por baixo dos panos passado para **JSON** pelo Laravel. 
+
+
+
+
