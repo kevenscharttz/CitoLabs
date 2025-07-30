@@ -32,3 +32,75 @@ Indo de fato para o assunto principal, como nós podemos encontrar o código que
 Imagine que em algum momento do código, acabe por cometer um erro de sintaxe por exemplo, ao tentar acessar o nosso programa vamos ser levados para uma página de erro completamente configurada para ajudar, e muito, nas hora de fazer um debug.
 
 Todos os _frameworks_ fornecem uma página dessa, só que o Laravel dá uma atenção especial para essa página, ele possui um próprio _framework_ de gerenciamento de erros para gerar isso, então ele mostrará exatamente onde está o nosso erro, mas não apenas isso, ele também mostra todas as funções que foram chamadas até o erro acontecer, mostra também a mensagem erro, basicamente ele vai ser nosso amigo para garantir que tudo esteja de acordo.
+
+## Roteando para o Controller
+
+Vamos começar a criar o nossos sistema de controle de séries, para começar, vamos criar uma página que liste as séries que eu tenho cadastrado. Primeiro de mais nada, vamos criar uma rota que se chamará **/series**, e nessa rota quero que seja exibido essa listagem de séries, só que não é interessante ficar escrevendo código dentro de uma função anônima, dentro do próprio arquivo de rotas, e por isso vamos criar um **controller**.
+
+Vamos ir para dentro da pasta de **Controllers** que fica dentro de **Http**, lá vamos criar uma nova classe chamada **SeriesController**, com essa classe criada, vamos precisar incluir o **namespace**, que nesse caso corresponde a estrutura de pastas **App/Http/Controllers**: 
+
+```php
+<?php 
+namespace app\Http\Controllers;
+
+class SeriesController
+{
+    
+}
+
+?>
+```
+
+Agora com a classe criada, vamos criar um método, por exemplo, **listarSeries()**, ou algo nesse sentido. Esse método é o que será executado quando chegarmos na rota **/series**, mas antes precisamos pensar no que vamos mostrar aqui.
+
+Pensando em algo didático simples, vamos criar uma array simples com algumas séries, e exibi-lá na tela utilizando **HTML** e um ciclo de repetição **foreach**:
+
+```php
+<?php
+
+namespace app\Http\Controllers;
+
+class SeriesController
+{
+
+    public function listarSeries(): void
+    {
+
+        $series = [
+            'Doctor House',
+            'Breaking Bad',
+            'Flash',
+            'The boys'
+        ];
+
+        $html = '<ul>';
+
+        foreach ($series as $serie) {
+            $html .= "<li>$serie</li>";
+        }
+        echo $html .= '</lu>';
+    }
+}
+```
+
+Agora, o que devo fazer para que quando eu acessar essa **URL**, o controller seja executado? Basicamente o que devo fazer é ir até o **web.php** onde estão as rotas, utilizar uma função dessa classe,  numa nova rota, então vou passar um array, onde o primeiro item desse array é a classe, o nome dela, seguido de dois ponto e uma especificação de que aquela é a classe, e o segundo item desse array é o nome do método que eu vou utilizar, apenas o nome, envolto de aspas.
+
+E nome da classe pode ser completo direto com todo caminho do namespace, ou importando o namespace e usando só o nome direto:
+
+```php
+<?php
+
+use App\Http\Controllers\SeriesController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/series', [SeriesController::class, 'listarSeries']);
+```
+
+Por fim, preciso ressaltar que essa é a maneira manual de se criar o controller, mas é possível fazer isso de outra forma.
+
+## Convenções de nome
+
