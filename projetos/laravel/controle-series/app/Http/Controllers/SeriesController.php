@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class SeriesController extends Controller
 {
-    public function index(): void
+    public function index(): string
     {
 
         $series = [
@@ -21,6 +21,6 @@ class SeriesController extends Controller
         foreach ($series as $serie) {
             $html .= "<li>$serie</li>";
         }
-        echo $html .= '</lu>';
+        return $html .= '</lu>';
     }
 }
