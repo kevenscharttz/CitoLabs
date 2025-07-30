@@ -120,3 +120,53 @@ class SeriesController extends Controller
 
 }
 ```
+
+Repare em algumas coisas diferentes de quando criamos a classe manualmente, primeiro que o namespace já feio automaticamente, segundo que a classe está estendendo uma classe chamada **controller**, classe essa que já veio no nosso projeto, e segundo que estamos usando, mesmo que não de fato utilizando, uma classe de **Request**.
+
+Falando sobre a classe que estamos estendendo, essa extensão nos dá uma gama de funcionalidades, basicamente estamos fazendo com que o nosso **controller** seja um **controller** do próprio Laravel em si, o que acaba trazendo essas funcionalidades que vão ser interessantes no futuro, porém, com o código que temos no momento, isso não será necessário, mas vamos deixa-ló ali já que não afeta em nada o código:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SeriesController extends Controller
+{
+    public function listarSeries(): void
+    {
+
+        $series = [
+            'Doctor House',
+            'Breaking Bad',
+            'Flash',
+            'The boys',
+        ];
+
+        $html = '<ul>';
+
+        foreach ($series as $serie) {
+            $html .= "<li>$serie</li>";
+        }
+        echo $html .= '</lu>';
+    }
+}
+
+```
+
+Um detalhes agora que precisamos ter em mente é o fato de que existe uma regra de nomenclatura para nossos métodos, não necessariamente faz mal nomearmos nosso método da maneira que queremos, mas existe um padrão para quando vamos criar nomes de métodos dos nossos **controllers**.
+
+Na documentação podemos achar algo como **Resource Controllers**, onde temos:
+
+| Verbo     | URI                  | Ação      | Nome da rota      |
+| --------- | -------------------- | --------- | ----------------- |
+| GET       | /photos              | índice    | fotos.índice      |
+| GET       | /photos/create       | criar     | fotos.criar       |
+| POST      | /photos              | loja      | fotos.loja        |
+| GET       | /photos/{photo}      | mostrar   | fotos.mostrar     |
+| GET       | /photos/{photo}/edit | editar    | fotos.editar      |
+| PUT/PATCH | /photos/{photo}      | atualizar | fotos.atualização |
+| DELETE    | /photos/{photo}      | destruir  | fotos.destruir    |
+
+No nosso caso por exemplo, estamos lidando com uma URL utilizando o **GET**, então o nome do nosso método que exibe essas séries será **index()**.
