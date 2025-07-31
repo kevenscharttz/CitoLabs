@@ -173,9 +173,9 @@ No nosso caso por exemplo, estamos lidando com uma URL utilizando o **GET**, ent
 
 ## Lidando com Request e Response
 
-Quando estamos trabalhando com um **controller**, esperamos uma requisição para devolvermos uma resposta, e com o Laravel podemos fazer exatamente isso. É por esse motivo que quando criamos o **controller** via terminal, essa classe já é importada, porque podemos receber por parâmetro, esse **request**, essa requisição **Request $request**. Dessa forma podemos obter várias informações da requisição, por exemplo, podemos pegar a **URL**, conseguimos pegar detalhes da **query string**, um input que viria de um formulário e etc.
+Quando estamos trabalhando com um **controller**, esperamos uma requisição para devolvermos uma resposta, e com o Laravel podemos fazer exatamente isso. É por esse motivo que quando criamos o **controller** via terminal, essa classe já é importada, porque podemos receber por parâmetro, esse **request**, essa requisição **Request $request**. Dessa forma podemos obter várias informações da requisição, por exemplo, podemos pegar a **URL**, conseguimos pegar detalhes da **query string**, um input que viria de um formulário e etc. Repetindo mais brevemente, o objeto $request oferece métodos como get(), URL() e method() para extrair dados da requisição.
 
-Também podemos retornar uma resposta, e um detalhe interessante é que aqui não estamos retornando nada, estamos exibindo, inclusive se eu tivesse algum erro em algum local, que não seja um erro de sintaxe, acabaríamos vendo o erro, só que a nossa resposta seria exibida por baixo do erro. Então algo que vamos mudar é, não dar mais echos direamente de um **controller**, não vamos fazer isso mais, vamos retornar o html.
+Também podemos retornar uma resposta, e um detalhe interessante é que aqui não estamos retornando nada, estamos exibindo, inclusive se eu tivesse algum erro em algum local, que não seja um erro de sintaxe, acabaríamos vendo o erro, só que a nossa resposta seria exibida por baixo do erro. Então algo que vamos mudar é, não dar mais echos direamente de um **controller**, não vamos fazer isso mais, vamos retornar o html. Resumindo, o Laravel converte automaticamente _strings_ em conteúdo de resposta HTML e _arrays_ e objetos em JSON.
 
 ```php
 <?php
@@ -186,7 +186,7 @@ use Illuminate\Http\Request;
 
 class SeriesController extends Controller
 {
-    public function index(): string
+    public function index(Request $request): string
     {
 
         $series = [
@@ -208,10 +208,13 @@ class SeriesController extends Controller
 ```
 
 
-Vale falar que podemos retornar uma resposta, e o Laravel nos ajuda bastante com esse detalhe de retornar uma resposta, por exemplo, caso eu retorne uma string, o Laravel pega essa string e adiciona no conteúdo da resposta, define um status, manda os cabeçalhos que tem que mandar, etc... Também é possível manipular esses dados, mas não vai ser o nosso caso no momento, vamos deixar da forma que está.
+Vale falar que podemos retornar uma resposta, e o Laravel nos ajuda bastante com esse detalhe de retornar uma resposta, por exemplo, caso eu retorne uma string, o Laravel pega essa string e adiciona no conteúdo da resposta, define um status, manda os cabeçalhos que tem que mandar, etc... Também é possível manipular esses dados, mas não vai ser o nosso caso no momento, vamos deixar da forma que está. Outra coisa interessante é que caso seja retornado um array por exemplo, é automaticamente por baixo dos panos passado para **JSON** pelo Laravel. 
 
-Outra coisa interessante é que caso seja retornado um array por exemplo, é automaticamente por baixo dos panos passado para **JSON** pelo Laravel. 
+Vamos agora trabalhar com o **request**, vamos supor que queremos acessar um **id** que está na **URL**, eu posso fazer isso através do **return $request->get( )**, onde passamos a chave dentro como parâmetro, no nosso caso a chave **'id'**. Se quisermos pegar a **URL** por exemplo, basta retornarmos o seguinte método, **return $request->url( )**, se quisermos obter o método usado para obtermos os dados, bata usarmos o **return $request->method( )**. Claro, essa são apenas alguns dos métodos, existem outros que serão vistos em outro momento.
 
+Voltando um pouco para a parte de **response**, além de ter uma resposta tendo um conteúdo, podemos ter uma resposta de redirecionamento, e podemos fazer isso de algumas formas, a mais "complicada" sendo usando o método **response (' ', 302, 'Location' => 'https://google.com)**, isso fará com que ao acessar a página, sejamos redirecionados para o google, mas, uma maneira mais fácil de fazer isso é usando o método **redirect ( )**, e o que ela faz? Exatamente aquilo que fizemos anteriormente com parâmetros e cabeçalho, mas apenas informando o local de redirecionamento.
+
+Com isso, está entendivel o roteamento para um **controller**, e como ele funciona recebendo uma requisição de forma que ele possa tratar esse requisição, e devolver uma resposta em formatos variados. Porém, um detalhe que ainda não está bom, é que está sendo criado um HTML dentro do **controller**, e isso é inadmissível, um código **Laravel** não pode ser feito dessa forma.
 
 
 
