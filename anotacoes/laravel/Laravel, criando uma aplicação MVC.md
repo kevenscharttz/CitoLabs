@@ -216,5 +216,98 @@ Voltando um pouco para a parte de **response**, além de ter uma resposta tendo 
 
 Com isso, está entendivel o roteamento para um **controller**, e como ele funciona recebendo uma requisição de forma que ele possa tratar esse requisição, e devolver uma resposta em formatos variados. Porém, um detalhe que ainda não está bom, é que está sendo criado um HTML dentro do **controller**, e isso é inadmissível, um código **Laravel** não pode ser feito dessa forma.
 
+Um detalhe que talvez eu tenha esquecido de citar acima sobre a função **response**, ela retorna um objeto do tipo `Response` com o corpo, status e cabeçalhos.
 
+## Extra sobre o objeto request
+
+O objeto de `Request` do Laravel nos fornece várias formas de atingir o mesmo objetivo.
+
+Por exemplo, para buscar um dado da query string, eu utilizei o método `get`. Porém nós também podemos utilizar o método `query` que vai gerar exatamente o mesmo resultado.
+
+A diferença entre o método `get` e o método `query` é que o método `get` busca o dado de qualquer lugar do nosso request, seja da query string ou mesmo de um campo enviado por post. Por isso o ideal é utilizar o método `query` para que nosso código fique mais explícito, deixando claro de onde vamos buscar o dado.
+
+## Views
+
+Bom, como dito anteriormente, nosso **controller** não está criado da melhor forma, o HTML estar sendo criado dentro dele é um problema, então o que vamos fazer basicamente é criar um arquivo que contenha o nosso HTML, e do nosso controller, incluir esse arquivo.
+
+Basicamente uma view no Laravel é essencialmente um template. É um arquivo que contém a estrutura HTML da página, juntamente com espaços para dados dinâmicos. Esses espaços reservados são preenchidos com os dados que o **controller** envia para a **view** antes de ela ser renderizada e enviada como resposta ao navegador.
+
+Agora sabendo disso, vamos para a pasta **views** que está dentro de **resources**, vamos criar nossa **view** para exibir as séries: 
+
+```php
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de séries</title>
+</head>
+<body>
+    <h1>Séries favoritas:</h1>
+    <ul>
+        <?php foreach ($series as $serie): ?>
+            <li><?= $serie?></li>
+        <?php endforeach; ?>
+    </ul>
+</body>
+</html>
+```
+
+Como pode ser visto, como dito, é possível utilizar dados dinâmicos. Porém apenas isso não é o suficiente, precisamos também fazer com que nosso **controller** chame essa **view**. Isso é possível retornando a função **view( )** passando como parâmetro o nome da **view**, e depois um array associativo contendo o nome dá variável que estamos usando na **view**, e depois o nome dá variável que queremos que tenham os dados passados no **controller**:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SeriesController extends Controller
+{
+    public function index(Request $request)
+    {
+
+        $series = [
+            'Doctor House',
+            'Breaking Bad',
+            'Flash',
+            'The boys',
+        ];
+
+        return view(
+            'listar-series',
+            ['series' => $series]
+        );
+    }
+}
+```
+
+Porém existe uma outra função que pode ser usada em alguns casos, que é o nosso inclusive, quando tanto as variáveis do **controller** quanto da **view** tem o mesmo nome, podemos utilizar no lugar desse array associativo a função **compact( )**, que fará exatamente a mesma coisa que o array, só que como o próprio nome já diz, é bem mais compacta, bastando passar o nome da variável: 
+
+``` php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class SeriesController extends Controller
+{
+    public function index(Request $request)
+    {
+
+        $series = [
+            'Doctor House',
+            'Breaking Bad',
+            'Flash',
+            'The boys',
+        ];
+
+        return view(
+            'listar-series',
+            compact('series')
+        );
+    }
+}
+```
 
