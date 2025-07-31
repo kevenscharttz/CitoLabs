@@ -16,12 +16,9 @@ class SeriesController extends Controller
             'The boys',
         ];
 
-        $html = '<ul>';
-
-        foreach ($series as $serie) {
-            $html .= "<li>$serie</li>";
-        }
-
-        return $html .= '</lu>';
+        return view(
+            'listar-series',
+            compact('series')
+        );
     }
 }
