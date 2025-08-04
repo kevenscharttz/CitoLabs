@@ -311,3 +311,45 @@ class SeriesController extends Controller
 }
 ```
 
+## Conhecendo o Blade
+
+Quando nós iniciamos o nosso projeto **Laravel**, dentro da pasta de **views**, um arquivo muito interessante veio criado, incluindo um formato de arquivo chamado **blade**, e o que é isso exatamente? Pra que serve? Bom, primeiramente ao mudarmos o formato da nossa **view** criada para **listar-series.blade.php**, percebesse que ao rodar esse programa nada parace mudar, então o que exatamente está ocorrendo?
+
+Bom, primeiramente devemos entender que o blade é uma _template engine_, ou seja, é um motor que nos ajuda a criar templates, views, uma infinidade de coisas, como um componente, ele trás muitas facilidades na hora de escrever o nosso código. Vamos começar a falar de algumas vantagens, dando uma olhada na documentação e depois no nosso código, percebesse que podemos fazer algumas modificações até que muito positivas, deixando-o mais "fácil" de entendes, por exemplo tirando essa introdução dos scripts PHP, o famoso **<?php ?>** , trocando-o por um simples **@**, ou ao invés do uso de um **echo**, apenas abrimos chaves duas vezes **{{ }}**:
+
+```php
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de séries</title>
+</head>
+<body>
+    <h1>Séries favoritas:</h1>
+    <ul>
+        @foreach ($series as $serie)
+            <li> {{ $serie }} </li>
+        @endforeach
+    </ul>
+</body>
+</html>
+```
+
+Então repare a facilidade que isso trás ao nosso código, até mesmo o uso do **;** não é necessário mais, o que devemos concordar que reduz e muito nosso código e sua "complexidade" a primeira vista.
+
+Saindo agora um pouco do assunto, voltando para nossa conversa sobre **views**, existe uma outra sintaxe para que seja possivel enviar dados para a view, com o uso do **with**, onde só escrevemos a o que nossa variável é equivalente:
+
+```php
+return view('listar-series')
+->with('series', $series);
+```
+
+## Criando um layout
+
+Antes de mais nada, vale mencionar um detalhe muito importante, assim como há um padrão para nomearmos nossas **actions** dos nossos **controllers**, também há um padrão na hora de nomearmos nossas **views**, e esse padrão é que sigamos o mesmo nome da nossa **action** para o nome da view. Porém veja, chamar a view, por exemplo, apenas de **index**  não é interessante, imagine vários arquivos com index um, dois, três... Concordamos que não é eficiente, para resolver isso vamos criar uma pasta chamada **series**, e aqui dentro vamos passar o nosso antigo **listar-series** para **index**. Com isso feito, há ainda um ultimo detalhe de devemos alterar para que tudo continue funcionando perfeitamente, que no casso é corrigir o caminho no nosso **controller**, normalmente utilizariamos uma barra para indicar que estamos querendo acessar um arquivo dentro de uma pasta, mas aqui, utilizamos apenas um ponto:
+
+```php
+return view('series.index') 
+	->with('series', $series);
+```
