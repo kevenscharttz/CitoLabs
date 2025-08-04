@@ -388,3 +388,50 @@ Componente criado, perfeito, mas como eu posso fazer uso dele? Se ele foi criado
 
 ```
 
+Por fim, vale dizer que também podemos criar esses componentes pelo terminal, rodando um comando ```php artisan make:component *nome do componente*```. A diferença de se fazer isso é que além de criar uma _view_, isso também vai criar uma classe de componentes, adicionada em **View**, dentro da pasta de **app**. Mas caso seja da preferência não criar essa classe, podemos usar o comando ```php artisan make:component layout –view```.
+
+## Mais funcionalidades
+
+Bom, ao utilizarmos algumas vezes o **ctrl + U** dentro do nosso código, as vezes acabamos por notar que alguns elementos HTML estão diferentes, o que o _blade_ faz por padrão, é que sempre que exibirmos qualquer conteúdo utilizando essa sintaxe, ou o antigo _echo_, como faríamos com PHP puro através do _echo_, o que o _blade_ faz é, transformar qualquer caractere que possa ter algum significado ambíguo dentro do HTML ou até de JavaScript, ele transforma esses caracteres em uma entidade HTML para garantir que não tenhamos nenhum problema.
+
+Outra coisa é, caso eu queira utilizar por exemplo ```{{ nome }}```, para que isso consiga ser exibido sem erros, precisamos incluir no inicio disso um **@**. O _**blade**_, vai entender que é para ignorar isso aqui e enviar do jeito que está, então quando eu atualizo ele agora não vai fazer o _parsed_ e vai enviar exatamente como isso está.
+
+Com isso entendido, vamos começar a criar uma nova view para a inserção de novas séries, bom, de começo podemos iniciar criando a nossa view de fato, chamando seus componentes e criando um formulário, apenas o básico: 
+
+```php
+<x-layout title="Nova Série">
+    <form action="" method="POST">
+        <label for="nome">Nome:</label>
+        <input type="text" name="nome" id="nome">
+    </form>
+</x-layout>
+```
+
+Agora é preciso criar o nosso **controller**, onde escrevemos uma função **create**, onde retornamos nossa view:
+
+```php
+public function create()
+    {
+        return view('series.create');
+    }
+```
+
+Finalizando, basta criarmos uma rota para essa nova tela:
+
+```php
+Route::get('/series/criar', [SeriesController::class, 'create']);
+```
+
+## Entendendo o conceito
+
+Agora vamos falar um pouco mais do Laravel no sentido de front-end, já vimos o **Blade**, que é uma ótima ferramenta para isso, mas podemos ir além. Existe uma ferramenta muito conhecida e utilizada no front-end, que é o webpack.
+
+O que o webpack faz? Simplificando bastante, Ele tem um arquivo de configuração, onde dizemos para ele o que queremos que esse **webpack** faça com nossos arquivos front-end, qualquer coisas relacionada a **front-end** pode ser feita por ele, como mover arquivos de um local para outro, transformar um SCCS em CSS, aplicar plugins, muitas coisas.
+
+Alguns frameworks já trazem isso bem abstraído, diminuindo a complexidade, trazendo-os configurados, mas quando trabalhamos com dependências sendo gerenciadas por nós mesmos, acabamos precisando lidar com o **webpack**, e para facilitar esse trabalho temos o **Laravel Mix**.
+
+## Laravel Mix
+
+O Laravel Mix é um pacote JavaScript, que nos fornece componentes para facilitar a escrita de um arquivo de configuração do webpack, por exemplo, caso eu queira aplicar e utilizar um plugin chamado **post.css**, ao invés que configurar inúmeras linhas, tudo que tenho que fazer é utilizar uma linha onde eu aponto para onde está o conteúdo que eu quero fazer o procedimento, e para o local onde esse conteúdo vai.
+
+Para instalar o Laravel Mix é necessário instalar o **NODE**, e depois disso utilizar o comando ```npm install```.
