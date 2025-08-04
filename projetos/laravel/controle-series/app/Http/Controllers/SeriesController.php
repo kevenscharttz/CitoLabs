@@ -16,9 +16,7 @@ class SeriesController extends Controller
             'The boys',
         ];
 
-        return view(
-            'listar-series',
-            compact('series')
-        );
+        return view('series.index')
+            ->with('series', $series);
     }
 }

@@ -353,3 +353,38 @@ Antes de mais nada, vale mencionar um detalhe muito importante, assim como há u
 return view('series.index') 
 	->with('series', $series);
 ```
+
+Com esse detalhe passado, vamos pensar em como podemos reutilizar partes da nossa view, como um componente, e isso é possível com o **blade**, para começar vamos criar uma pasta chamada **components** e dentro vamos criar o arquivo **layout.blade.php**. Dentro desse novo arquivo, passamos o layout que pode se manter igual em diferentes arquivos para essa componentização, onde na areá onde teoricamente vai o conteúdo que é diferente, incluimos uma variável **{{ $slot }}**, além disso, podemos passar mais informações, como um parâmetro, por exemplo o **{{ $title }}**: 
+
+```php
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $title }}</title>
+</head>
+
+<body>
+    <h1>{{ $title }}</h1>
+    {{ $slot }}
+</body>
+
+</html>
+
+```
+
+Componente criado, perfeito, mas como eu posso fazer uso dele? Se ele foi criado corretamente, ou seja, dentro da pasta "components", com esse nome. Bom, agora podemos excluir toda a parte que já está presente dentro do nosso componente, e depois, envolver o conteúdo que não está presente pela tag personalizada ```<x-layout>```, onde o **X** indica que estamos trabalhando com um componente blade, seguido do nome do nosso componente. Apenas isso já funcionaria, mas, estamos passando também um atributo chamado **title**, que podemos definir nessa tag como um parâmetro ```<x-layout title="Séries">```:
+
+```php
+<x-layout title="Séries">
+    <ul>
+        @foreach ($series as $serie)
+            <li>{{ $serie }}</li>
+        @endforeach
+    </ul>
+</x-layout>
+
+```
+
