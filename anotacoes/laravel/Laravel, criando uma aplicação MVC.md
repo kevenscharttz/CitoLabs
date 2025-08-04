@@ -345,3 +345,11 @@ return view('listar-series')
 ->with('series', $series);
 ```
 
+## Criando um layout
+
+Antes de mais nada, vale mencionar um detalhe muito importante, assim como há um padrão para nomearmos nossas **actions** dos nossos **controllers**, também há um padrão na hora de nomearmos nossas **views**, e esse padrão é que sigamos o mesmo nome da nossa **action** para o nome da view. Porém veja, chamar a view, por exemplo, apenas de **index**  não é interessante, imagine vários arquivos com index um, dois, três... Concordamos que não é eficiente, para resolver isso vamos criar uma pasta chamada **series**, e aqui dentro vamos passar o nosso antigo **listar-series** para **index**. Com isso feito, há ainda um ultimo detalhe de devemos alterar para que tudo continue funcionando perfeitamente, que no casso é corrigir o caminho no nosso **controller**, normalmente utilizariamos uma barra para indicar que estamos querendo acessar um arquivo dentro de uma pasta, mas aqui, utilizamos apenas um ponto:
+
+```php
+return view('series.index') 
+	->with('series', $series);
+```
