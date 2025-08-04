@@ -435,3 +435,37 @@ Alguns frameworks já trazem isso bem abstraído, diminuindo a complexidade, tra
 O Laravel Mix é um pacote JavaScript, que nos fornece componentes para facilitar a escrita de um arquivo de configuração do webpack, por exemplo, caso eu queira aplicar e utilizar um plugin chamado **post.css**, ao invés que configurar inúmeras linhas, tudo que tenho que fazer é utilizar uma linha onde eu aponto para onde está o conteúdo que eu quero fazer o procedimento, e para o local onde esse conteúdo vai.
 
 Para instalar o Laravel Mix é necessário instalar o **NODE**, e depois disso utilizar o comando ```npm install```.
+
+## Instalando o Bootstrap
+
+Bom, existem algumas formas para instalar o bootstrap, mas a que será usada é através do NPM, utilizando o comando ```npm install bootstrap```, com isso feito podemos vamos precisar importar o Bootstrap para o arquivo app.scss (arquivo esse anteriormente chamado de app.css), dentro da pasta css que se encontra em resources: 
+
+```scss
+@import 'tailwindcss';
+@import "~bootstrap/scss/bootstrap";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+```
+
+Só o que eu preciso fazer agora? Eu preciso fazer toda configuração para que? Para fazer com que esse meu arquivo SCSS, meu arquivo SCSS, seja compilado para CSS e venha aqui para minha pasta _public_.
+
+Mas ao invés de fazer toda uma configuração maluca, precisarei apenas alterar levemente meu webpack criado anteriormente: 
+```js
+const mix = require('laravel-mix');
+
+mix.js('resources/js/app.js', 'public/js')
+   .sass('resources/css/app.scss', 'public/css');
+```
+
+Agora quando eu executar o ```npm run mix```,  o que ele vai fazer é executar o Laravel Mix, e da primeira vez que você rodar esse comando, ele vai baixar o _plugin_ de SASS. Com isso feito, ele gerará na pasta public um fichário CSS, com toda configuração do bootstrap dentro.
+
+Agora no final, pasta importar esse bootstrap para nosso componente, mas para isso, podemos utilizar uma função **asset** para essa importação,  é uma boa prática utilizarmos essa função _asset_, sempre que vamos buscar um recurso que está dentro da “public”, porque de novo, no futuro, em alguma configuração sua, você pode querer ter os seus _assets_, seus arquivos estáticos, em outro lugar, em algum CDN da vida, um S3 da Amazon e etc.
