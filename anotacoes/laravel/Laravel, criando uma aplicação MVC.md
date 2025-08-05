@@ -469,3 +469,131 @@ mix.js('resources/js/app.js', 'public/js')
 Agora quando eu executar o ```npm run mix```,  o que ele vai fazer é executar o Laravel Mix, e da primeira vez que você rodar esse comando, ele vai baixar o _plugin_ de SASS. Com isso feito, ele gerará na pasta public um fichário CSS, com toda configuração do bootstrap dentro.
 
 Agora no final, pasta importar esse bootstrap para nosso componente, mas para isso, podemos utilizar uma função **asset** para essa importação,  é uma boa prática utilizarmos essa função _asset_, sempre que vamos buscar um recurso que está dentro da “public”, porque de novo, no futuro, em alguma configuração sua, você pode querer ter os seus _assets_, seus arquivos estáticos, em outro lugar, em algum CDN da vida, um S3 da Amazon e etc.
+
+## Configurações
+
+Agora, para esse próximo passo vamos começar a configurar o nosso Laravel para utilização de banco de dados, já que nossa ideia é ser possível adicionar séries no nosso sistema. Dentro da pasta **config**, temos vários arquivos de configuração, por exemplo o **app.php**, que se trata das configurações da nossa aplicação, mas esse não é o foco, o que procuramos são as configurações responsáveis pelas conexão com o banco de dados, no caso a **database.php**.
+
+A minha escolha é utilizar o PostgreSQL para esse projeto, e saber disso é importante pois nesse arquivo de configurações podemos alterar as variáveis que usaremos para deixar de acordo com a nossa conexão de preferência, porém, existem alguns dados que são sensíveis como senhas e etc, que não fariam bem serem expostas no código, para resolver isso vamos até o arquivo **.env**, onde podemos editar os dados referentes ao banco, e por que isso? Porque no nosso arquivo de configuração, ele prioriza os dados que estão presentes no **.env**, e caso esse não exista, ele utiliza o valor default:
+
+```php
+DB_CONNECTION=pgsql
+
+DB_HOST=127.0.0.1
+
+DB_PORT=5436
+
+DB_DATABASE=controleSeries
+
+DB_USERNAME=postgres
+
+DB_PASSWORD=########
+```
+
+## Migrations
+
+Bom, dentro da pasta **database**, temos algumas outras pastas como: **factories**, **migrations** e **seeders**, apesar de que eu vá utilizar apenas a **migrations**, vale apena citar brevemente sobre as outras.
+
+Basicamente, os **seeders** são criadores de dados que podemos utilizar para já inserir no banco de dados quando uma aplicação, podemos usar como exemplo um novo funcionário que entrou em determinada empresa,e já queremos que ele tenha uma base de dados inserida em sua maquina, ou talvez um usuário padrão com determinadas permissões para ele, enfim...
+
+Já as **factories**, são forma de se criar dados falsos, por exemplo, queremos criar vários usuários para realizar testes, eu posso utilizar uma **factory** para criar inúmeros nomes de mentira, idades falsas, enfim.
+
+E a **migration**, que é o que vamos utilizar, é basicamente um versionamento do banco de dados, muito similar ao **GIT** por exemplo, onde basicamente podemos fazer ou desfazer uma migration, no caso, ir ou voltar de um ponto a pouco na "linha do tempo" do nosso banco de dados.
+
+Para criarmos a nossa própria **migration** é muito simples, podemos ir até o nosso terminal e incluir o seguinte comando: ```php artisan make:migration [nome-da-migration]```,  e o que isso faz? Ele gera uma nova classe para nós, essa classe estende, ou seja, é uma **migration**. A nossa tabela não terá informações tão complexas, apenas id, nome e o timestamps. E o que é esse _timestamps_ aqui? Basicamente isso cria os campos de inserido e atualizado em determinado momento, o que isso quer dizer? Quando eu vou criar uma nova série no meu banco de dados, esse campo de criado em determinado momento vai ser preenchido com momento atual e quando eu atualizar uma série, um campo de atualização vai ser modificado também: 
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('series', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 128);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::drop('series');
+    }
+};
+```
+
+Agora, para que de fato essas tabelas sejam criadas, é preciso rodar um outro comando, sendo ele: ```PHP artisan migrate```, dessa forma, nossas tabelas são criadas caso o banco esteja conectado corretamente. Um detalhe importante é que além das tabelas que nós criamos, o Laravel cria automaticamente algumas, por exemplo a tabela **migrations**, onde o Laravel armazena quais delas foram executadas, para que dessa forma ao rodar o comando novamente, ele não fique tentando criar tabelas que já existem.
+
+## DB Facade
+
+Bom, agora chegou a hora de fazer com que o formulário realmente salve no banco de dados uma nova série, então para começarmos isso vamos modificar o formulário, incluindo seu caminho de envio, e depois, salvar uma nova rota para isso:
+
+```php
+<form action="/series/salvar" method="POST">
+```
+
+```php
+Route::post('/series/salvar', [SeriesController::class, 'store']);
+```
+
+Certo, nossa rota está pronta, agora vamos criar o nosso método para que esse "salvamento" ocorra, e o nome dele será **store**, respeitando as regras de nomenclatura do Laravel. Para realmente eu obter o nome da série, será utilizado um método chamado **input**, da variável **request**, onde passamos por parâmetro a name do input:
+
+```php
+public function store(Request $request)
+{
+	$nomeSerie = $request->input('nome');
+}
+```
+
+Agora de fato para adicionar essa série no banco de dados, existem algumas formas de fazer, e primeiro vamos utilizar a menos interessante. Existe uma classse onde basicamente só existem métodos estáticos, seu nome é **facade**, porém não é necessariamente uma implementação **design pattern** forçado, mas é como chamam.
+
+Essa facade se chama ```DB::```, um dos vários métodos estáticos disponiveis que podemos usar é o **insert(' ')**, onde podemos passar nossa **querySQL**, podemos incluir uma condicional if para sabermos se o que está sendo feito nisso está ocorrendo adequadamente, ou está ocorrendo erro. Além disso, tem um pequeno detalhe extra que é necessário para que isso tudo funcione, existe um ataque, uma falha de segurança que podemos ter em formulários que o Laravel nos obriga a tratar, é um de _cross site request forgery_, é basicamente a possibilidade de outras pessoas forjarem uma requisição de outro _site_ para o meu, ou alguma coisa assim. mas basicamente o que precisamos fazer para corrigir é, recebemos uma informação do servidor, sempre que essa página de formulário for carregada, essa página aqui.
+
+Então precisamos enviar de volta essa informação para que lá no nosso _back-end_, saibamos que esta informação realmente foi enviada por esse formulário e não de algum outro lugar, então embora a solução pareça complexa, para corrigirmos basta no nosso formulário adicionar `@csrf`, essa diretiva do _blade_, ele já cuida de todos os detalhes para nós.
+
+```php
+ public function store(Request $request)
+    {
+        $nomeSerie = $request->input('nome');
+
+        if (DB::insert('INSERT INTO series (name) VALUES (?)', [$nomeSerie])){
+            return "OK";
+        } else {
+            return "ERROR";
+        }
+        
+    }
+```
+
+Porém ainda existe um problema, os timestamps não estão funcionado, então indo vazios para o banco, mas isso podemos arrumar depois. Voltando agora para a tela inicial de séries, podemos notar que ela ainda não está conectada com o banco, como podemos resolver isso? Bom, podemos fazer a mesma coisa que fizemos antes para inserir as séries, mas agora usando a função **select** e alterando obviamente o **querySQL**. Mas claro, isso não vai trazer um array de nomes certinho, ou vai? Podemos testar isso usando uma função **dd()**, que significar _dump and die_, ele vai executar o famoso var_dump para a gente, e depois encerrar tudo que se segue, sendo muito útil para debug:
+
+```php
+public function index(Request $request)
+    {
+
+        $series = DB::select('SELECT name FROM series');
+        return view('series.index')
+            ->with('series', $series);
+    }
+```
+
+Mas apenas isso não será o suficiente, pois, estamos obtendo um objeto, ou seja, precisaremos especificar qual parâmetro desse objeto queremos que seja impresso no nosso index: 
+
+```php
+@foreach ($series as $serie)
+    <li class="list-group-item">{{ $serie->name }}</li>
+@endforeach
+```
+
+Mas, outro problema vem agora, ao terminarmos de adicionar uma série, somos redirecionados apenas para a tela onde aparece nosso **ok** e nosso **error**, ou seja, precisamos fazer um redirecionamento.
