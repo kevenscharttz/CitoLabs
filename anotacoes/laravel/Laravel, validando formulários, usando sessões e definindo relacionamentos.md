@@ -74,3 +74,32 @@ Mas se eu quiser o inverso, pegar todos os elementos com exceção de algo, usam
         
     }
 ```
+
+## Agrupando Actions
+
+Bom, como estamos focados em melhorar nosso projeto, algo que pode ser refeito para maior qualidade de código é referente as rotas, se for notado, elas estão sendo uma repetição quanto ao **controller**, e existe uma forma de fazer com que todas essas rotas utilizem o mesmo **controller**. 
+
+Podemos utilizar o **Route::controler( )**, dentro dela vou informar qual o **controller** que estamos utilizando, o **controller** que vai controlar esse grupo de rotas. Como essas rotas serão adicionas a um grupo, utilizamos o método **group( )**, com uma função anônima dentro, e dentro dessa função vão nossas rotas.
+
+Detalhe, com isso feito, podemos apagar os controller que estão dentro das rotas:
+
+```php
+<?php
+
+use App\Http\Controllers\SeriesController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return redirect('/series');
+});
+
+
+Route::controller(Seriescontroller::class)->group(function(){
+    Route::get('/series', ['index']);
+
+    Route::get('/series/criar', ['create']);
+
+    Route::post('/series/salvar', ['store']);
+});
+
+```
