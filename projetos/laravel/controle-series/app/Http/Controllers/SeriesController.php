@@ -30,7 +30,7 @@ class SeriesController extends Controller
         $nomeSerie = $request->only(['nome', 'sinopse']);
         Serie::create($nomeSerie);
 
-       return redirect('/series');
+       return to_route('series.index');
         
     }
 }
