@@ -13,7 +13,7 @@ class SeriesController extends Controller
     {
 
         $series = Serie::query()
-            ->orderBy('name')
+            ->orderBy('nome')
             ->get();
 
         return view('series.index')
@@ -27,10 +27,8 @@ class SeriesController extends Controller
 
     public function store(Request $request)
     {
-        $nomeSerie = $request->input('nome');
-        $serie = new Serie();
-        $serie->name = $nomeSerie;
-        $serie->save();
+        $nomeSerie = $request->only(['nome', 'sinopse']);
+        Serie::create($nomeSerie);
 
        return redirect('/series');
         
