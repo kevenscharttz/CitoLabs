@@ -103,3 +103,35 @@ Route::controller(Seriescontroller::class)->group(function(){
 });
 
 ```
+
+Além disso, caso tenha esquecido, existe um padrão chamado **Resource Controller**, se o controller e as rotas seguem esse padrão, existe uma forma mais simples ainda de definir isso, usando:
+
+```php
+Route::resource('/series', SeriesController::class);
+```
+
+Dessa forma, uma rota no verbo **GET**, com **URI** padrão, vai executar um método **index**, uma **URI** com /create vai executar o método **create**, enfim.
+## Nomeando Rotas
+
+Um problema que veio a tona com as ultimas mudanças foi a possibilidade de eu querer alterar as **URL's**, e ter que ficar alterando em todas as nossas views, o que não seria prático. Para resolver esse problema, podemos utilizar um conceito chamado **rotas nomeadas**.
+
+Toda rota pode ter um nome, e podemos informar esse nome utilizando o método **name( )**:
+
+```php
+Route::controller(Seriescontroller::class)->group(function(){
+	Route::get('/series', 'index')->name('series.index');
+	Route::get('/series/criar', 'create')->name('series.create');
+	Route::post('/series/salvar','store')->name('series.store');
+});
+```
+
+Isso não altera a **URL**, ela continua sendo a mesma. Então agora, onde eu utilizava a **URL** diretamente na view, será alterado para uma diretiva do **blade**: 
+```{{ route('series.create')}}```. Então, com rotas nomeados podemos nos eximir da responsabilidade de lembrar o nome das URLs, o caminho das URLs, e permite que mudemos as URLs.
+
+Além disso, agora nossos redirecionamentos podem ser alterados para funções mais interessantes, como a: 
+
+```
+`return to_route(route:’series.index’);`
+```
+
+Dessa forma estou criando uma resposta de redirecionamento para a rota com o nome `’series.index’`.
