@@ -597,3 +597,53 @@ Mas apenas isso não será o suficiente, pois, estamos obtendo um objeto, ou sej
 ```
 
 Mas, outro problema vem agora, ao terminarmos de adicionar uma série, somos redirecionados apenas para a tela onde aparece nosso **ok** e nosso **error**, ou seja, precisamos fazer um redirecionamento.
+
+## Eloquent ORM
+
+Vamos começar isso arrumando os problemas apontados acima, primeiro de tudo farei com que o usuário seja redirecionado para a pagina inicial de séries, dando retorno da função **redirect ('/series')**, apesar de existir formas melhores de se fazer isso, a abordagem utilizada será essa.
+
+Quanto aos **created_at** e **update_at**, que não estão sendo preenchidos, isso acontece porque a forma com que eu estou preenchendo os dados de nome das séries, usando o **DB**, faz com que eu tenha que colocar no comando **SQL**, também esses atributos, apesar do Laravel preencher automaticamente isso, mas não com esse método.
+
+O que esse DB faz? Ele nos fornece acesso ao banco de dados diretamente, então temos funções como _insert_, _select_, _delete_, _update_, só que precisamos escrever SQL, e eu comentei que o Laravel forneceria ferramentas que inclusive nos ajudariam a não precisar escrever SQL. A ferramenta que irei usar, fornecida pelo Laravel é um **ORM** ou **Object Relational Mapping**, um mapeamento do mundo orientado a objetos, para o mundo relacional, só que o **Eloquent** segue um padrão bem diferente, onde a mesma classe vai fazer tudo, ela representará uma série, ela vai inserir um nova série, buscará uma série, o que é uma baita simplicidade.
+
+Como podemos criar isso? Podemos fazer isso apenas indo até a pasta model e criando a mão, ou indo até o terminal e escrever: ```php artisan make:model Serie```, criando assim a nossa classe:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Serie extends Model
+{
+    
+}
+```
+
+Essa _model_ meio que é mapeada para uma tabela do banco, então se eu tenho uma classe chamada série, o _eloquent_ ORM vai buscar uma tabela no banco de dados chamada “series”, que é exatamente o nome da tabela que temos lá, mas se o nome da tabela fosse “seriados” por exemplo, eu poderia ter aqui o atributo _table_ definido como seriados, então eu consigo configurar isso, mas o padrão já vai servir.
+
+E como essa classe está estendendo _model_, temos vários métodos que podemos utilizar, no nosso controller, primeiro, podemos buscar os dados usando essa nova model, porém ao fazer isso, o que nos é retornado é uma **Collection**, com os itens dessa coleção, e cada item é uma coleção, porém o código vai continuar funcionado porque o atributo nome existe em cada um desses itens:
+
+```php
+$serie = Serie::all();
+```
+
+Quando ao nosso **store**, podemos deixar nosso request como está, mas depois criarmos um novo objeto de **Serie**, e definir que o nome do novo objeto de **Serie** será o resultado trazido do request. No final basta usarmos o método **save( );** desse objeto, para que dessa forma seja feito a inserção no banco de dados: 
+
+```php
+    $nomeSerie = $request->input('nome');
+    $serie = new Serie();
+    $serie->name = $nomeSerie;
+    $serie->save();
+```
+
+Com essa mudança, os timestamps serão colocados no banco corretamente. Então repara que já conseguimos fazer bastante coisa, já temos o nosso sistema completamente funcional, eu só quero chamar atenção para um detalhe aqui, do _eloquent_ ORM, temos uma classe que representa uma série, que sabe se salvar no banco de dados e que também permite que executemos consultas, por exemplo, imagina que eu queira trazer essas séries aqui ordenadas pelo nome, eu consigo fazer uma _query_ um pouco mais complexa do que simplesmente buscar todos. 
+
+Com o método **query** o que fazemos? Podemos criar um **query builder**, ou criador de querys, e nisso eu posso fazer várias coisas, como por exemplo ordenar os nomes de ordem crescente ou decrescente. Isso gera como retorno uma **query**, que para ser executada de fato, precisamos usar o método **get(  ):**
+
+```php
+        $series = Serie::query()
+            ->orderBy('name')
+            ->get();
+```

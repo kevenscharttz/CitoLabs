@@ -32,7 +32,7 @@ class SeriesController extends Controller
         $serie->name = $nomeSerie;
         $serie->save();
 
-        return redirect('/series');
+       return redirect('/series');
         
     }
 }
