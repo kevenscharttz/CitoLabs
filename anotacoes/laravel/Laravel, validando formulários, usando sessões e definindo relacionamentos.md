@@ -130,8 +130,96 @@ Isso não altera a **URL**, ela continua sendo a mesma. Então agora, onde eu ut
 
 Além disso, agora nossos redirecionamentos podem ser alterados para funções mais interessantes, como a: 
 
-```
-`return to_route(route:’series.index’);`
+```php
+return to_route(route:’series.index’);
 ```
 
 Dessa forma estou criando uma resposta de redirecionamento para a rota com o nome `’series.index’`.
+
+Voltando para as rotas, como nós nomeamos tudo de forma padronizada, podemos usar ao invés daquele grupo de rotas, o resource, que já contem em si algumas regras sobre ligações quando usamos os **resource controllers**:
+
+```php
+Route::resource('/series', SeriesController::class);
+```
+
+## Excluindo uma série
+
+Agora vamos nos aprofundar um pouco mais já vimos várias coisas interessantes, então agora vamos partir para uma nova funcionalidade, a de deletar uma série. Mas antes disso, é interessante falarmos sobre um pequeno detalhe. Nas nossas rotas está sendo usando o **Rute::resource**, que basicamente trás todas as todas que estamos usando caso seja seguindo o padrão dos **Resource Controllers**, mas além dos que estamos usando, ele trás também os que não estamos usando, como a rota para deletar ou atualizar uma série, então é interessante especificar quais desses estão sendo usados. Para fazer isso, podemos usar alguns métodos que já vimos em outros momentos, o **except (  )** e o **only (  )**, onde especificaremos quais serão utilizadas: 
+
+```php
+Route::resource('/series', SeriesController::class)
+	->only(['index', 'create', 'store']);
+```
+
+Bom, com isso feito, podemos partir para a nossa feature, vamos começar isso acrescentando um botão nas nossas listas se séries, que indique que ao ser clicado, a série será apagada. E por que um botão e não um link? Quando temos uma ação que vai, por exemplo, acessar o nosso banco de dados, ou executar alguma regra de negócios e ter algo que é permanente, que salva no banco, que cria uma mensagem, que envia um e-mail.
+
+Esse tipo de ação não deve ser feito através de uma requisição _get_. Imagina que esse sistema está disponível na web, e o motor do Google vai acessar esse sistema, e ele vai seguir nossos links. Então, ele vai seguir esse link de remover, e vai acabar removendo as séries, por exemplo.
+
+Então, sempre que temos alguma ação que é permanente, ou no caso, destrutiva, que é de remover uma série, vamos utilizar o verbo _post_. Mas você pode ter ficado sabendo, que em HTTP temos um verbo específico para remover detalhes, que no caso seria o verbo _delete_. Exatamente, e esse é o ideal de se utilizar quando podemos, só que o HTML só funciona com os verbos _get_ e _post_. Como estamos trabalhando com HTML, precisamos trabalhar com um desses dois.
+
+Sabendo disso agora, podemos partir para a criação da nossa nova rota:
+
+```php
+Route::post('/series/destroy', [SeriesController::class, 'destroy']);
+```
+
+Porém apenas isso não será o bastante, vamos imaginar o seguinte, como poderemos saber qual série exatamente desejamos excluir, precisamos de um dado para isso, como o **id**, mas como podemos passar esse id? Podemos passar o id da série pela **URI** da série, passando-a como parâmetro, já que o Laravel nos ajuda com isso:
+
+```php
+Route::post('/series/destroy/{serie}', [SeriesController::class, 'destroy']);
+```
+
+Agora, no nosso controller, vamos criar uma novo método que receberá como parâmetro a variável de request, e nesse método podemos recuperar o id dessa série, mas, como podemos fazer enviar? Essa URL `series/destroy/{serie}`, espera um _post_, eu não posso ter um link, como eu já falei. Então, eu vou criar um formulário que só tem um botão, nesse formulário vamos definir na sua action uma rota nomeada, e depois simplesmente passar o método da variável $serie: 
+
+```php
+<x-layout title="Séries">
+    <a class="btn btn-primary" href="{{ route('series.create') }}" role="button">Link</a>
+
+    <ul class="list-group">
+        @foreach ($series as $serie)
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ $serie->nome }}
+                
+                <form action="{{ route('series.destroy', $serie->id) }}" method="post">
+                    @csrf
+                    <button class="btn btn-danger btn-sm">
+                        X
+                    </button>
+                </form>
+            </li>
+        @endforeach
+    </ul>
+</x-layout>
+
+```
+
+Agora o botão está sendo enviado para o local certo e com o id de forma correta, por fim, basta realizarmos de fato a exclusão dessa série escolhida. No nosso controller, dentro do método, vamos simplesmente usar o método de **Serie** chamado **destroy**, onde dentro desse método vamos passar nossa série que veio com o **$request** e redirecionar para página inicial:
+
+```php
+public function destroy(Request $request)	
+{
+	Serie::destroy($request->serie);
+	return to_route('series.index');
+}
+```
+
+Com isso, tudo já vai funcionar corretamente, porém podemos fazer algo para melhorar mais ainda, nas nossas rotas, ao invés de fazer ela ser do tipo **POST**, podemos fazer com que ela seja do tipo **DELETE** o que é mais correto: 
+```php
+Route::delete('/series/destroy/{serie}', [SeriesController::class, 'destroy'])->name('series.destroy');
+```
+
+Porém como já foi dito o **HTML** não suporta outros métodos além do GET e do POST. Porém, existe uma magica que o Laravel trás para gente, informando que o método por baixo dos panos vai ser do tipo **DELETE**, apenas usando esse outro parâmetro após o nosso **@csrf** por exemplo, parâmetro esse sendo **@method("DELETE")**.
+
+E agora de fato por fim, como estamos usando corretamente o método, podemos incluir a rota dentro de resource, e especificando que o destroy também pode ser usado:
+
+```php
+Route::resource('/series', SeriesController::class)
+	->only(['index', 'create', 'store', 'destroy']);
+```
+
+Porém,  para de fato isso funcionar, temos que lembrar de uma detalhizinho muito chato, que é o fato de que quando usamos o resource **controllers**, os parâmetros dessas URL's precisam ser no singular, por exemplo, ao invés de **serie**, eu devo usar **series**:
+
+```php
+Serie::destroy($request->series);
+```
+
