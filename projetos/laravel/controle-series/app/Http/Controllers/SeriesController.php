@@ -43,7 +43,7 @@ public function destroy(Serie $series, Request $request)
 {
 
     $series->delete();
-    $request->session()->flash('mensagem.sucesso', 'Série removida com sucesso');
+    $request->session()->flash('mensagem.sucesso', "{$series -> nome} removida com sucesso");
 
     return to_route('series.index');
 }
