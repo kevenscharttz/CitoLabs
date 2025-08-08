@@ -217,9 +217,56 @@ Route::resource('/series', SeriesController::class)
 	->only(['index', 'create', 'store', 'destroy']);
 ```
 
-Porém,  para de fato isso funcionar, temos que lembrar de uma detalhizinho muito chato, que é o fato de que quando usamos o resource **controllers**, os parâmetros dessas URL's precisam ser no singular, por exemplo, ao invés de **serie**, eu devo usar **series**:
+Porém,  para de fato isso funcionar, temos que lembrar de uma detalhezinho muito chato, que é o fato de que quando usamos o resource **controllers**, os parâmetros dessas URL's precisam ser no singular, por exemplo, ao invés de **serie**, eu devo usar **series**:
 
 ```php
 Serie::destroy($request->series);
 ```
 
+## Session e Flash Messages
+
+Bom, seria interessante que existisse uma mensagem de sucesso ao excluirmos uma série, podemos fazer isso utilizando dados de sessão, mas como posso pegar os dados de uma sessão? Através do request, eu posso utilizar o método **session(  )**. 
+
+Então, quando eu remover uma série, posso adicionar uma mensagem à sessão usando o método **put**:
+
+```php
+$request->session()->put('mensagem.sucesso', 'Série removida com sucesso');
+```
+
+A primeira parte é a chave e a segunda é de fato a mensagem. Com essa mensagem feita, basta ir até o método do index, onde podemos recuperar essa mensagem e armazena-lá em uma variável através do método **get(  )** e depois retornar essa mensagem na view com o **with(  )**:
+
+```php
+$mensagemSucesso = $request->session()->get('mensagem.sucesso');
+
+return view('series.index')
+	->with('series', $series)
+	->with('mensagemSucesso', $mensagemSucesso);
+```
+
+É preciso usar isso na **view** agora, criando uma div que apresentasse essa mensagem, e envolver isso com um **isset**, para que caso exista essa mensagem ela ser mostrada:
+
+```php
+    @isset ( $mensagemSucesso )
+        <div class="alert alert-success">
+            {{ $mensagemSucesso }};
+        </div>
+    @endisset
+```
+
+Porém quando atualizamos a página, essa mensagem continua aparecendo, porque ela continua salva na sessão, para que ela seja apagada após ser mostrada e a página ser atualizada, precisamos utilizar um outro métodos chamado **forget(  )** do nosso **request**:
+
+```php
+$request->session()->forget('mensagem.sucesso');
+```
+
+Esse método que utilizamos para essa tarefa não é o único que existe, e apesar de ser bem tranquilo, existe uma forma ainda mais fácil de se executar essa tarefas de mostrar a mensagem e depois remove-lá, que utilizando o **flash** no lugar do **put**. Mas, como que eu faço uso de **flash messages**? Basta adiciona-ló como qualquer outro dado de sessão, só que agora eu não preciso mais usar o **forget( )**, porque ela já é esquecida automaticamente. uma _flash message_ é uma mensagem que adiciono na sessão, um dado que adiciono na minha sessão, que só dura um _request_:
+
+```php
+$request->session()->flash('mensagem.sucesso', 'Série removida com sucesso');
+```
+
+Seguindo o mesmo esquema explicado, podemos adicionar uma nova mensagem para quando o usuário conseguir adicionar uma série:
+
+```php
+$request->session()->flash('mensagem.sucesso', 'Série adiciona com sucesso');
+```
