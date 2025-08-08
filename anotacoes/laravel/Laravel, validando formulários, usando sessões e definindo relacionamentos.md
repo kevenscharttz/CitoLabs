@@ -270,3 +270,48 @@ Seguindo o mesmo esquema explicado, podemos adicionar uma nova mensagem para qua
 ```php
 $request->session()->flash('mensagem.sucesso', 'Série adiciona com sucesso');
 ```
+
+## Mais dados de requisição
+
+Continuando dentro desse tema da mensagem de sucesso, seria interessante mostrar na mensagem o nome da série que estou adicionando ou excluindo. Primeiro na mensagem de inclusão no banco, como puxar o nome de qual série foi adicionada?  Ao criar uma série, preciso pegar o nome essa série que foi criada para adicionar na mensagem. E esse método `::create`, ou seja, o método estático _create_, já nos retorna a _model_ que foi criada, no caso uma série nossa. Então, se eu já tenho a série em mãos, basta adicionar o nome dela na nossa mensagem:
+
+```php
+$nomeSerie = Serie::create($request->all());
+$request->session()->flash('mensagem.sucesso', "{$nomeSerie -> nome} adiciona com sucesso");
+return to_route('series.index');
+```
+
+Agora para a mensagem de exclusão dá série, é um pouco mais complicado, o nosso método que está sendo usado, o **destroy**, não nos devolve qual foi a série removida. Para que eu possa recuperar os dados necessários, existem algumas formas. Primeiro, podemos usar o método **find(  )** , ele encontra uma série baseada no id:
+
+```php
+$serie = Serie::find($request->series);
+```
+
+ Essa é uma forma. Só que tem uma outra forma um pouco mais interessante. O Laravel consegue nos ajudar em alguns cenários quando tenho parâmetros na rota.
+
+lembra que esse _destroy_ a rota é `/series/destroy/{series}`?. Então, consigo ter um parâmetro chamado `series`, e ele nos traz alguma informação. Qual informação? Depende do tipo que eu definir esse parâmetro. Vou te explicar o que isso quer dizer.
+
+ Eu vou ter um parâmetro chamado `series` e o tipo dele vai ser inteiro, por exemplo. Com isso, eu vou ter acesso ao ID da minha série. Então isso já deixa um pouco mais interessante o código. Então vamos atualizar e garantir que tudo continua funcionando.
+
+ Agora, se ao invés de um inteiro, eu disser que é uma _model_ do tipo série, o que o Laravel vai fazer por baixo dos panos é exatamente a parte do código que está dentro das chaves.
+
+Como ele já vai fazer isso, eu não preciso dessa linha `$serie = Serie::find($series);`. Então, repara que eu consegui buscar a série sem nem precisar adicionar código no meu _controller_, só de informar o parâmetro que eu estou utilizando `public function destroy (Serie $series)`, isso é bastante interessante.
+
+Mas vamos lá, continuando,  agora eu não preciso mais chamar esse método estático _destroy_, passando, por exemplo, dessa minha `series` o ID. Eu posso fazer isso sem problema nenhum, mas posso também, direto da minha instância, chamar o método _delete_, então `$series->delete()`.
+
+ Só que agora temos um erro, antes utilizávamos o _request_, como fazemos agora? E a boa notícia é que eu posso, sem problema nenhum, ter mais de um parâmetro nas minhas _actions_. Então, basta eu adicionar um _request_, `public function destroy (Serie $series, Resquest $request)`.
+
+E agora, um detalhe. Eu comentei que como tem um parâmetro na minha rota, o nome desse parâmetro importa, porque o Laravel vai pegar de `/series/destroy/{series}` o nome entre chaves e com isso ele vai saber que esse parâmetro da _action_ é para ser mapeado por esse parâmetro da rota, de alguma forma. Então, o Laravel utiliza esse nome para se achar.
+
+Agora, quando estamos falando do _request_, não precisamos, o nome pode ser qualquer coisa, pode ser requisição, por exemplo, que não vai ter problema. Ele vai ver que o tipo desse parâmetro é um _request_ e vai saber criar para nós. Então, dessa forma, tenho minha série sendo removida, e posso adicionar o nome dela. `“ Série ‘ {$series ->nome} removida com sucesso”´)`:
+
+```php
+    public function destroy(Serie $series, Request $request)
+    {
+
+        $series->delete();
+        $request->session()->flash('mensagem.sucesso', 'Série removida com sucesso');
+
+        return to_route('series.index');
+    }
+```
