@@ -315,3 +315,26 @@ Agora, quando estamos falando do _request_, não precisamos, o nome pode ser qu
         return to_route('series.index');
     }
 ```
+
+## Processo de validações
+
+Ao tentarmos enviar uma série vazia, sem passar um nome, acabamos por gerar um errro justamente pelo envio vazio desse input.  Por que isso acontece? Quando mandamos um _input_ com valor vazio, o Laravel não preenche isso. Então, é como se aquele valor, se aquele nome fosse nulo. Então eu estou tentando mandar um nulo para o banco de dados. E isso é um problema, porque o nome de uma série não pode ser nulo.
+
+Como podemos resolver isso? Pensando no envio do formulário para o banco de dados, no **$request** existe um método chamado **validade( )**, onde podemos especificar quais tipos de validação para serem executados no elemento que queremos validar, nesse caso o nome. Caso essas condições não seja atendidas, é redirecionado para a mesma página:
+
+```php
+public function store(Request $request)
+    {
+        $request->validate([
+            'nome' => ['required', 'min:3']
+        ]);
+        $nomeSerie = Serie::create($request->all());
+
+        $request->session()->flash('mensagem.sucesso', "{$nomeSerie -> nome} adiciona com sucesso");
+        return to_route('series.index');
+        
+    }
+```
+
+vale lembrar que o método **`validate()`** não apenas redireciona o usuário de volta em caso de falha na validação, mas também disponibiliza as mensagens de erro e os dados antigos na sessão, facilitando a exibição das mensagens e o repopulamento dos campos no formulário.
+
