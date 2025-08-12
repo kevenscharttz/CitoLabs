@@ -320,7 +320,7 @@ Agora, quando estamos falando do _request_, não precisamos, o nome pode ser qu
 
 Ao tentarmos enviar uma série vazia, sem passar um nome, acabamos por gerar um errro justamente pelo envio vazio desse input.  Por que isso acontece? Quando mandamos um _input_ com valor vazio, o Laravel não preenche isso. Então, é como se aquele valor, se aquele nome fosse nulo. Então eu estou tentando mandar um nulo para o banco de dados. E isso é um problema, porque o nome de uma série não pode ser nulo.
 
-Como podemos resolver isso? Pensando no envio do formulário para o banco de dados, no **$request** existe um método chamado **validade( )**, onde podemos especificar quais tipos de validação para serem executados no elemento que queremos validar, nesse caso o nome. Caso essas condições não seja atendidas, é redirecionado para a mesma página:
+Como podemos resolver isso? Pensando no envio do formulário para o banco de dados, no **$request** existe um método chamado **validade( )**, onde podemos especificar quais tipos de validação para serem executados no elemento que queremos validar, nesse caso o nome. Caso essas condições não seja atendidas, é redirecionado para a página anterior(ou no caso, a que ocorreu a validação):
 
 ```php
 public function store(Request $request)
@@ -338,3 +338,54 @@ public function store(Request $request)
 
 vale lembrar que o método **`validate()`** não apenas redireciona o usuário de volta em caso de falha na validação, mas também disponibiliza as mensagens de erro e os dados antigos na sessão, facilitando a exibição das mensagens e o repopulamento dos campos no formulário.
 
+## Exibindo erros
+
+Como dito anteriormente, caso a validação não passe, o Laravel retorna uma resposta de redirecionamento para a página anterior. E além disso, na _flash message_, ele adiciona todas as informações do _request_ que não foi válido. Então conseguimos acessar o _request_. E quando ocorre essa falha, além de adicionar todos os campos, todo o _input_, todo o _request_ no _flash_, ele também adiciona todos os erros, as mensagens de erro. E existe um detalhe do Laravel que transforma todos esses erros em uma variável já utilizavel, chamada **errors**. Na documentação já existe um HTML pronto para exibição dessas mensagens: 
+
+```php
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+```
+
+Copiando isso para nossa **view** de layout. E o que está ocorrendo exatamente? Estou verificando se existe algum erro. Essa variável `errors` sempre vai existir. Então, eu tenho acesso a esse método que verifica se tem algum dado na minha variável `errors`. E se existir, eu vou exibir todos os erros. Só isso.
+
+Então, com isso, já começamos a brincar com as validações, só que eu comentei que, de novo, além das mensagens de erro, o Laravel também coloca na _flash_ toda a requisição. Então, se eu quiser preencher esse campo, eu posso fazer da seguinte forma, eu vou para a _view_ de _create_, e lembra que posso informar o nome de alguma forma? Esse nome vai vir da minha sessão, vai vir da minha requisição anterior.
+
+E para isso, o Laravel nos fornece uma função chamada _old_. Essa função pega da _flash session_, daquela sessão que dura uma vez só, a requisição anterior, que foi adicionada pela validação. Assim, como eu tenho toda essa minha requisição, posso pegar o campo chamado “nome”:
+
+```php
+<x-layout title="Nova Série">
+	{{-- Essa função pega da flash session, daquela sessão que dura uma vez só, a requisição anterior, que foi adicionada pela validação. --}}
+	<x-series.form :action="route('series.store')" :nome="old('nome')" :update="false" />
+</x-layout>
+```
+
+Então, com isso, se eu adicionar somente um “A” no nome da série no navegador, ele volta e já preenche para nós. Só que então entra um outro detalhe, quando eu inspeciono a página, estou tentando mandar esse novo formulário com o valor do método como _put_. Ou seja, como se eu estivesse atualizando uma série existente. Então, preciso mudar aquela nossa lógica. No _form_, ao invés de verificar se o nome existe, vou simplesmente fazer um _if_, se o _update_ existe e é verdadeiro:
+
+```php
+<form action="{{ $action }}" method="POST">
+    @csrf
+    @if ($update)
+        @method('PUT')
+    @endif
+    <div class="mb-3">
+        <label for="nome" class="form-label">Nome:</label>
+        <input type="text" name="nome" id="nome" class="form-control"
+            @isset($nome) value="{{ $nome }}@endisset">
+    </div>
+    <button type="submit" class="btn btn-primary">Adicionar</button>
+</form>
+```
+
+Dessa forma, no edit irei definir que o update é **true**, e no create que é **false**.
+
+## Extraindo um FormRequest
+
+Ainda trabalhando com as mensagens de erros, existem alguns probleminhas que precisam ser corrigidos
