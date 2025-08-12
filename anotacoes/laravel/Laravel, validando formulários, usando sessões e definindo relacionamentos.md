@@ -388,4 +388,65 @@ Dessa forma, no edit irei definir que o update é **true**, e no create que é *
 
 ## Extraindo um FormRequest
 
-Ainda trabalhando com as mensagens de erros, existem alguns probleminhas que precisam ser corrigidos
+Ainda trabalhando com as mensagens de erros, existem alguns probleminhas que precisam ser corrigidos, o primeiro é a necessidade de copiar o código de validação em outros métodos, e repetição de código não é algo legal, e que a mensagens de erros estão todas em inglês, o que não é tão interessante no nosso caso.
+
+Para resolver o primeiro problema, podemos fazer isso de uma forma até que simples, vamos pensar, e se eu precisasse adicionar uma outra regra, precisaria alterar em dois lugares. Como podemos fazer isso? Posso, ao invés de utilizar o _request_ genérico do Laravel, criar o meu próprio _request_ e já informar todas as regras necessárias.
+
+Para isso, vamos utilizar o Artisan, **php artisan make:request SeriesFormRequest**. Isso cria uma classe de _request_ para nós. E eu informo o nome dessa classe, ou seja, uma requisição de um formulário de série, que tem as informações de uma série:
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class SeriesFormRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+
+    }
+}
+```
+
+ Então já temos todas as funcionalidades de uma requisição normal. Então, esse primeiro método, não estamos trabalhando com detalhes de segurança, autenticação, autorização, então todo mundo vai estar autorizado a fazer esse _request_. Então vou simplesmente retornar um _true_, `return true:`. E entra o que realmente precisamos, que são as regras de validação. Então vamos pegar aquela nossa regra para o nome e copiar e adicionar.  Informando que o nome é obrigatório e precisa de pelo menos 3 caracteres:
+
+```php
+    public function rules(): array
+    {
+        return [
+           'nome' => ['required', 'min:3', 'max:45'],
+        ];
+    }
+```
+
+Dessa forma, eu tenho uma classe específica para as minhas validações, para representar a minha requisição, então com isso, no formulário, ao invés de utilizar essa a classe de Request, vou utilizar o `SeriesFormRequest`. E além disso não será mais necessário o método validate.
+
+Agora imagine que eu queira uma mensagem personalizada para o nome de uma série. Então, quando tem qualquer erro com o nome de uma série, quero uma mensagem personalizada. Imagina que eu queira uma mensagem personalizada para o nome de uma série. Então, quando tem qualquer erro com o nome de uma série, quero uma mensagem personalizada:
+
+```php
+    public function messages()
+    {
+        return [
+            'nome.required' => 'O nome é obrigátorio',
+            'nome.min' => 'É obrigatório ao menos :min caracteres',
+            'nome.max' => 'O nome não pode ultrapassar :max caracteres',
+        ];
+    }
+```
+
+Mas e se o que eu queira de verdade seja a tradução dessas mensagens? Bom, indo novamente ao terminal, podemos usar o comando ```php artisan lang:publish``` para criarmos uma pasta **lang**. Por enquanto só temos inglês, todo o nosso sistema teoricamente está em inglês e poderíamos trabalhar com traduções. Caso deixemos o sistema em inglês, sem alterar nada das configurações, podemos ir até a mensagem especifica e altera-lá, porém com isso, eu não estou fazendo da melhor forma, o ideal era ter um outro arquivo de idioma, em outra pasta, para ser em português, mas não vamos falar disso agora. Só para vermos que seria possível fazer essa tradução.
