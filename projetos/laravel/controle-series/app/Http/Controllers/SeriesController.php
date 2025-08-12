@@ -26,7 +26,7 @@ class SeriesController extends Controller
     }
 
     public function create()
-    {
+    {   
         return view('series.create');
     }
 
@@ -56,7 +56,7 @@ class SeriesController extends Controller
     }
 
     public function update(Serie $series, Request $request)
-    {
+    {   
         $series->fill($request->all());
         $series->save();
 
