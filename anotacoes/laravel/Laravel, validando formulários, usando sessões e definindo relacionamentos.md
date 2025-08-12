@@ -450,3 +450,75 @@ Agora imagine que eu queira uma mensagem personalizada para o nome de uma série
 ```
 
 Mas e se o que eu queira de verdade seja a tradução dessas mensagens? Bom, indo novamente ao terminal, podemos usar o comando ```php artisan lang:publish``` para criarmos uma pasta **lang**. Por enquanto só temos inglês, todo o nosso sistema teoricamente está em inglês e poderíamos trabalhar com traduções. Caso deixemos o sistema em inglês, sem alterar nada das configurações, podemos ir até a mensagem especifica e altera-lá, porém com isso, eu não estou fazendo da melhor forma, o ideal era ter um outro arquivo de idioma, em outra pasta, para ser em português, mas não vamos falar disso agora. Só para vermos que seria possível fazer essa tradução.
+
+## Temporadas e Episódios
+
+Para definirmos um relacionamento com o Eloquent ORM, nós não vamos criar uma propriedade nova, nós vamos criar um método de relacionamento.  que antes de criarmos o relacionamento entre série e uma temporada, por exemplo, preciso ter essa temporada. Então vamos criar as _models_ de temporada e de episódio. E se eu adiciono o parâmetro M, ele já cria uma _migration_ para mim ```php artisan make:model Season -m```.
+
+Eu tenho a _model_ de temporada e a _model_ de episódio. Então vamos voltar para a série, `Serie.php`. Em algum momento que tenha a série, eu quero poder acessar suas temporadas. Mas eu já falei que eu não vou criar essa propriedade, então para acessar, vou criar um método de relacionamento.
+
+Então é criado um método chamado **temporadas**, e o nome desse método é o nome pelo qual eu quero acessar esse relacionamento. Se quando eu tiver uma série, eu quiser acessar temporadas, vou criar um método chamado temporadas. Agora que eu tenho esse método, ele precisa retornar alguma forma de relacionamento, e temos várias. No caso, uma série tem várias temporadas, posso simplesmente escrever isso em inglês, dizendo que essa série _has many_, ou seja, “tem muitas temporadas”, no nosso caso, “season”, `return $this->hasMany(related: Season::class):`
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Serie extends Model
+{
+    use HasFactory;
+
+    protected $fillable=['nome'];
+
+    public function temporadas()
+    {
+        return $this->hasMany(Season::class);
+    }
+}
+```
+
+O que isso está fazendo? Ele está informando que uma série vai ter um relacionamento com a _model_ de temporada do tipo 1 para muitos. Uma série possui várias temporadas. Inclusive, posso fazer o relacionamento inverso também, posso dizer que uma temporada pertence a alguma série, então eu vou criar um método de série.  Essa temporada tem uma série, ela pertence a uma série. Posso retornar informando que `return $this->belongsTo(Serie::class)`:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Season extends Model
+{
+    
+    public function series(){
+        return $this->belongsTo(Serie::class);
+    }
+
+        public function episodes()
+    {
+        return $this->hasMany(Episode::class);
+    }
+}
+
+```
+
+ Agora, uma temporada tem também muitos episódios, então vamos lá, `public function episodes()`, e eu posso definir no retorno `return $this->hasMany(Episode::class)`. Mesma coisa na classe de episódio, eu posso mapear a temporada, então `public function season()`, que vai retornar `return $this->belongsTo(Season::class)`.
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Episode extends Model
+{
+    public function season()
+    {
+        return $this->belongsTo(Season::class);// pertence a temporadas
+    }
+}
+
+```
