@@ -595,3 +595,23 @@ $series = Serie::with('temporadas')
 	->get();
 ```
 
+## Recriando o banco
+
+Bom, uma coisa que estava me incomodando um pouco eram os nomes que eu estava usando em alguns elementos, acabando por misturar inglês com português, então para corrigir isso foi alterado esses elementos do banco como **numero** para **number** nas **Migrations**. Depois para recriar o banco de dados do zero, foi utilizado o comando ```php artisan migrate:fresh```, que remove todas as tabelas existentes e executa as **migrations** novamente.
+
+Uma funcionalidade importante adicionada é o `onDelete('cascade')` nos relacionamentos das migrations. Isso garante que, ao excluir uma série, todas as suas temporadas e episódios relacionados também sejam automaticamente removidos, e ao excluir uma temporada todos os seus episódios também são removidos, mantendo a integridade do banco de dados: 
+
+```php
+Schema::create('episodes', function (Blueprint $table) {
+
+	$table->id();
+	
+	$table->unsignedTinyInteger('number');
+	
+	$table->foreignId('season_id')->constrained()->onDelete('cascade');
+
+});
+```
+
+Lembrando que foi adicionado em temporadas e episódios.
+
