@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('seasons', function (Blueprint $table) {
+            
             $table->id();
+            
+            $table->foreignId('series_id')->constrained();
+
+            $table->unsignedTinyInteger('numero');
             $table->timestamps();
         });
     }
