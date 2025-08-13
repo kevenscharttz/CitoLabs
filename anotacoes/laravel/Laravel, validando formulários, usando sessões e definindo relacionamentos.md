@@ -576,3 +576,22 @@ E o que isso faz? A parte até antes do **constrained( )**, cria o campo **Unsig
 
 E um detalhe, eu vou voltar no nosso _controller_. Se ao invés da propriedade, ou seja, com essa sintaxe, eu acessar o método, quando atualizo, tenho o acesso ao relacionamento. E se eu tenho acesso ao relacionamento, consigo modificar a _query_. Recapitulando essa parte de relacionamento, se acessar como se fosse uma propriedade, eu acesso a coleção, já pego as temporadas. Se eu acessar através do método tenho o relacionamento, o _query builder_, ou seja, uma possibilidade de filtrar isso, para depois pegar a coleção.
 
+## Mais sobre Models
+
+ Aprendi como tornar a ordenação por nome padrão ao buscar séries, utilizando um escopo global no _model_ `Serie`. Isso garante que, sempre que você buscar as séries, elas virão ordenadas alfabeticamente, sem precisar especificar a ordenação no _controller_:
+
+```php
+protected static function booted(){
+	self::addGlobalScope('ordered', function(Builder $queryBuilder){
+		$queryBuilder->orderBy('nome');
+	});
+}
+```
+
+Além disso, você também aprendeu como carregar automaticamente os relacionamentos de temporadas junto com as séries, utilizando o atributo `$with` no _model_ ```protected $with = ['temporadas'];```. Isso é útil quando você precisa acessar as temporadas com frequência, evitando consultas adicionais ao banco de dados:
+
+```php
+$series = Serie::with('temporadas')
+	->get();
+```
+
