@@ -5,14 +5,14 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Http\Requests\SeriesFormRequest;
 use Illuminate\Support\Facades\DB;
-use App\Models\Serie;
+use App\Models\Series;
 
 
 class SeriesController extends Controller
 {
     public function index(Request $request)
     {
-        $series = Serie::with('temporadas')
+        $series = Series::with('seasons')
             ->get();
         $mensagemSucesso = $request->session()->get('mensagem.sucesso');
         return view('series.index')
@@ -27,25 +27,24 @@ class SeriesController extends Controller
 
     public function store(SeriesFormRequest $request)
     {
-        $nomeSerie = Serie::create($request->all());
+        $nomeSerie = Series::create($request->all());
         $request->session()->flash('mensagem.sucesso', "{$nomeSerie -> nome} adiciona com sucesso");
         return to_route('series.index');
     }
 
-    public function destroy(Serie $series)
+    public function destroy(Series $series)
     {
         $series->delete();
         return to_route('series.index')
         ->with('mensagem.sucesso', "{$series -> nome} removida com sucesso");
     }
 
-    public function edit(Serie $series)
+    public function edit(Series $series)
     {
-        dd($series->temporadas());
         return view('series.edit')->with('series', $series);
     }
 
-    public function update(Serie $series, SeriesFormRequest $request)
+    public function update(Series $series, SeriesFormRequest $request)
     {   
         $series->fill($request->all());
         $series->save();
