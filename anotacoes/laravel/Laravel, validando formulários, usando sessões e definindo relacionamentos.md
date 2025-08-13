@@ -522,3 +522,57 @@ class Episode extends Model
 }
 
 ```
+
+## Migrations
+
+Começamos a mapear os relacionamentos do modelo, série com temporadas, e isso etá quase funcionado, então precisamos ver alguns detalhes. Primeiro, o Eloquent está montando a **query**, utilizando como chave estrangeira uma coluna chamada **serie_id**, só que como estamos usando todo o sistema em inglês, deve ser **series_id**. Podemos resolver de uma forma, no relacionamento de série com temporadas, além de informar com qual classe ela vai se relacionar, posso informar qual nome da chave estrangeira, no caso vai ser **series_id**. Com isso, se eu atualizar, ele já passa a utilizar a coluna **series_id**. Assim, conseguimos personalizar o nosso modelo do banco de dados.  Caso eu precisasse fazer com que essa chave estrangeira referencie uma coluna na minha tabela, que não é a minha chave primária, eu poderia informar o último parâmetro `localKey`.
+
+```php
+class Serie extends Model
+{
+    use HasFactory;
+    protected $fillable=['nome'];
+
+    public function temporadas()
+    {
+        return $this->hasMany(Season::class, 'series_id');
+    }
+}
+```
+
+Com isso entendido, vamo só passar os olhos nos relacionamentos possíveis que o Eloquent fornece. Dando uma olhada na documentação nós temos: "one to one", "one to many", "many to many", "has one throught", "has many throught", "One to One (polymorphic)", "one to many (polymorphic)", "many to many (polymorphic)" são os relacionamentos.
+
+1. **One To Many (Um para Muitos)**: Uma série possui várias temporadas (implementado na aula).
+2. **Belongs To (Pertence a)**: O inverso de "One To Many". Uma temporada pertence a uma série, um episódio pertence a uma temporada.
+3. **One To One (Um para Um)**: Um usuário possui um endereço.
+4. **Many To Many (Muitos para Muitos)**: Um aluno pode fazer vários cursos, e um curso pode ter vários alunos matriculados. Requer uma tabela intermediária.
+5. **Has One Through / Has Many Through**: Semelhantes aos seus parentes (One To One e One To Many), mas com uma tabela intermediária envolvida no relacionamento. Exemplo: Um mecânico trabalha em um carro, e o carro tem um dono; pode-se acessar o dono do carro através do mecânico.
+6. **Relacionamentos Polimórficos**: Permitem que um relacionamento seja feito com mais de uma model. Por exemplo, um autor de blog e um post de blog podem ter imagens relacionadas.
+
+Vamos no nosso código agora, e abrir a _migration_ de temporadas. O que uma temporada tem? Ela já tem o seu ID, ela tem os _timestamps_, quando a temporada foi criada. Agora, vou ter também algum inteiro para fazer o relacionamento com o ID da série. Só que o que acontece, quando eu tenho esse ID, como é o caso da minha série, esse ID cria uma coluna do tipo `bigIncrement`, e ele usa esse tipo `unsignedBigInteger`. O que isso quer dizer? É um tipo inteiro maior e só positivo.
+
+Além disso, tenho a minha coluna de `series_id`, mas eu não tenho aquela minha chave estrangeira. Para eu criar a chave estrangeira de fato, eu posso utilizar o método `foreign`. Então, a minha `series_id` é uma chave estrangeira, que referencia a coluna ID na tabela, ou seja, `on(table: ‘series’)`:
+```php
+    public function up(): void
+    {
+        Schema::create('seasons', function (Blueprint $table) {
+            
+            $table->id();
+            $table->foreign('series_id')->references('id')->on('series');
+            $table->unsignedBigInteger('series_id');
+
+            $table->unsignedTinyInteger('numero');
+            $table->timestamps();
+        });
+    }
+```
+
+Mas isso é extremamente verboso, então para facilitar, o Laravel fornece outra sintaxe: 
+```php
+$table->foreignId('series')->constrained();
+```
+
+E o que isso faz? A parte até antes do **constrained( )**, cria o campo **UnsignedBIgInteger** com o nome de **series**, e o **contrained( )** faz o relacionamento, ele pega o nome do campo e referência uma coluna ID, a chave primária da tabela que estamos nos relacionando.
+
+E um detalhe, eu vou voltar no nosso _controller_. Se ao invés da propriedade, ou seja, com essa sintaxe, eu acessar o método, quando atualizo, tenho o acesso ao relacionamento. E se eu tenho acesso ao relacionamento, consigo modificar a _query_. Recapitulando essa parte de relacionamento, se acessar como se fosse uma propriedade, eu acesso a coleção, já pego as temporadas. Se eu acessar através do método tenho o relacionamento, o _query builder_, ou seja, uma possibilidade de filtrar isso, para depois pegar a coleção.
+
