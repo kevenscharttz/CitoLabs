@@ -615,3 +615,99 @@ Schema::create('episodes', function (Blueprint $table) {
 
 Lembrando que foi adicionado em temporadas e episódios.
 
+## Temporadas e Episódios
+
+Antes de começarmos de fato, precisamos resolver um problema que está acontecendo. No código formulário, estou mandando a série através da sintaxe do Blade `{{ $serie->nome }}`, e vimos que isso fornece uma proteção contra XSS. Então, ele está fazendo um _encode_ de todos os caracteres especiais, para entidades HTML. Então as aspas se tornam o caractere `&#039;`.
+
+Então, o meu “&” está sendo transformado em uma entidade HTML e esse duplo _encoding_ está causando essa estranheza. Então eu vou simplesmente utilizar a sintaxe insegura. Então, ao invés de abrir `{{}}`, eu vou abrir `{!! $serie->nome !!`}. E com isso, temos o problema resolvido.
+
+Agora teremos 2 formulários diferentes para criação e edição de formulários. Em seguida,  implementamos o formulário de criação de séries, adicionando campos para o número de temporadas (`seasonsQty`) e episódios por temporada (`episodesPerSeason`), utilizando o sistema de _grid_ do _Bootstrap_ para o layout:
+
+```php
+<x-layout title="Nova Série">
+    <form action="{{ route('series.store') }}" method="POST">
+        @csrf
+        <div class="row md-3">
+            <div class="col-8">
+                <label for="nome" class="form-label">Nome:</label>
+                <input type="text" name="nome" id="nome" autofocus class="form-control" value="{{ old('nome') }}">
+            </div>
+            <div class="col-2">
+                <label for="seasonsQty" class="form-label">Temporadas:</label>
+                <input type="text" name="seasonsQty" id="seasonsQty" class="form-control" value="{{ old('seasonsQty') }}">
+            </div>
+            <div class="col-2">
+                <label for="episodesQty" class="form-label">Episódios:</label>
+                <input type="text" name="episodesQty" id="episodesQty" class="form-control" value="{{ old('episodesQty') }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Adicionar</button>
+    </form>
+</x-layout>
+
+```
+
+Para verificar se os dados estão sendo recebidos corretamente no _controller_, utilizo `dd($request->all())`. Após a criação da série, implemento um loop alinhado para criar as temporadas e os episódios, utilizando os relacionamentos do _Laravel_ (`$serie->seasons()->create()` e `$season->episodes()->create()`) para simplificar a criação dos registros:
+
+```php
+public function store(SeriesFormRequest $request)
+    {   
+        $series = Series::create($request->all());
+        for ($i = 1; $i <= $request->seasonsQty; $i++){
+            $season = $series->seasons()->create([
+                'number' => $i,
+            ]);
+
+            for ($j = 1; $j <= $request->episodesQty; $j++){
+                $season->episodes()->create([
+                    'number' => $j
+                ]);
+            }
+        }
+        $nomeSerie = Series::create($request->all());
+        $request->session()->flash('mensagem.sucesso', "{$nomeSerie -> nome} adiciona com sucesso");
+        return to_route('series.index');
+    }
+```
+
+É abordado a necessidade de configurar o _mass assignment_ nas _models_ de `Season` e `Episode`, adicionando `protected $fillable = ['number']` para permitir a atribuição em massa do número da temporada e do episódio.
+
+Por fim, ele instalamos a _debugbar_ do _Laravel_ (`composer require barryvdh/laravel-debugbar --dev`) para analisar as _queries_ executadas e identifica um problema de performance devido ao grande número de _queries_ realizadas para inserir os dados.
+
+## Bulk Insert
+
+No começo, a gente tava com um problema: pra cada série que criávamos, com duas temporadas e cinco episódios em cada uma, eram disparados 13 _queries_! Aí não dava, né? Precisava dar um jeito de diminuir isso.
+
+Pra resolver essa questão, dei uma olhada nas ferramentas que o Laravel oferece pra lidar com os relacionamentos entre as tabelas. Vi que tem os métodos `createMany` e `saveMany`, mas eles ainda fazem as coisas meio que uma por uma, o que não ia resolver meu problema de diminuir as _queries_.
+
+Aí, a solução que encontrei foi usar o método `insert` do Laravel. Com ele, a gente consegue mandar vários registros de uma vez só pro banco. O que eu fiz foi criar um _array_ com todas as temporadas, colocando as informações que precisava, como o `series_id`. Depois, usei o `Season::insert()` pra mandar todas as temporadas de uma vez só.
+
+Depois de salvar as temporadas, precisei pegar os IDs delas pra poder salvar os episódios de cada uma. Pra isso, mandei uma nova _query_ pra buscar todas as temporadas daquela série.
+
+Com as temporadas em mãos, criei outro _array_, dessa vez com os episódios, e coloquei o `season_id` de cada um com o ID da temporada certa. Aí, foi só usar o `Episode::insert($episodes)` pra salvar todos os episódios de uma vez.
+
+```php
+    public function store(SeriesFormRequest $request)
+    {   
+        $series = Series::create($request->all());
+        $seasons = [];
+        for ($i = 1; $i <= $request->seasonsQty; $i++){
+            $season[] = [
+                'series_id' => $series->id,
+                'number' => $i,
+            ];
+        }
+        Season::insert($seasons);
+
+        $episodes = [];
+        foreach ($series->seasons as $season){
+            for ($j = 1; $j <= $request->episodesQty; $j++){
+                $episodes[] = [
+                    'season_id' => $season->id,
+                    'number' => $j,
+                ];
+            }
+        }
+        Season::insert($episodes);
+    }
+```
