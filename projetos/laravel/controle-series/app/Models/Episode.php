@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Episode extends Model
 {
+
+    protected $fillable = ['number', 'episode_id'];
     public $timestamps = false;
 
     public function season()
     {
-        return $this->belongsTo(Season::class);// pertence a temporadas
+        return $this->belongsTo(Season::class);
     }
 }
