@@ -32,3 +32,7 @@ O padrão MVC é constituído de **MODEL**, **VIEW** e **CONTROLLER**.
 Para a instalação do novo primeiro projeto **Laravel**, temos algumas formas de fazer isso, mas a que optaremos será através do **Composer**, com o comando: ```composer global require laravel/installer```.
 
 ## Testando o Projeto Laravel com o Servidor de Desenvolvimento
+
+No nosso projeto, um dos elementos desse projeto é o **Artisan**, ele é basicamente um tipo de operário do nosso framework, para executar um conjunto de operações, ele é o **CLI**, o **Command Line Interface** é uma linha de comandos através do qual podemos dar instruções para a criação de um controlador, criação de models, listagem de rotas, criação de migrations, etc.
+
+Seu comando base para utilização é, começar com o PHP, incluir o **artisan** e em seguida o comando que eu desejar ```php artisan```. E caso enviemos apenas isso, será retornado uma lista com os comandos que podemos usar. Caso usemos o comando **serve**, dessa forma: ```php artisan serve```, vamos executar um servidor local no **ip** e **porta** padrões do framework.
