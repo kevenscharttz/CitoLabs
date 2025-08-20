@@ -11,4 +11,4 @@ Route::get('/sobre', function () {
    echo 'É sobre isso e tá tudo bem';
 });
 
-Route::get('/main',[MainController::class, 'index']);
+Route::get('/main/{value}',[MainController::class, 'index']);
