@@ -19,3 +19,27 @@ Route::get('/sobre', function () {
    echo 'É sobre isso e tá tudo bem';
 });
 ```
+
+## Criar um Controller e Uma Route para o Controller
+
+Nesta aula foi visto sobre a criação de um controlador no Laravel, a aula foi bem prática então começamos criando um controlador via artisan no terminal, usando o comando: ```php artisan make:controller MainController```, que gera um novo controlador localizado na pasta app/http/controllers. Esse controlador feito pelo artisan vem com algumas coisas, primeiro que ele herda funcionalidades de um controlador pai, permitindo a reutilização de métodos existentes, e já vem por padrão com o uso de um namespace **Request**, que será melhor discutido em outro momento, mas resumidamente, é uma classe que armazena informações sobre pedidos feitos à aplicação.
+
+Neste controller, criamos um método index que retorna uma mensagem simples, um básico 'Hello World' quando chamado: 
+
+```php
+class MainController extends Controller
+{
+	function index()
+	{
+		echo "hello world!";
+	}
+}
+```
+
+Para tornar esse método acessível, é necessário definirmos uma rota correspondente, especificando que a rota '/index', deve acessar a classe **MainController**, e chamar o método **index**:
+
+```php
+Route::get('/index',[MainController::class, 'index']);
+```
+
+## Apresentar Uma View a Partir de um Controller
