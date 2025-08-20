@@ -43,3 +43,19 @@ Route::get('/index',[MainController::class, 'index']);
 ```
 
 ## Apresentar Uma View a Partir de um Controller
+
+Nesta aula, abordei o conceito de **views** no Laravel e como criar uma view utilizando o Blade. A view é muito importante para a apresentação dos dados. Primeiramente, utilizando novamente o **Artisan**, foi criado uma view usando o comando ```php artisan make:view main``` e o Laravel cria um arquivo **.blade.php**. Nesta view eu fiz um código HTML simples, apenas com um título e parágrafo e em seguida fui até o nosso **controller**. 
+
+No método **index**, alterei o código e utilizei um método **view( )**, que serve para renderizar as views da aplicação, e tudo que preciso fazer é passar o nome dessa view como parâmetro:
+
+```php
+class MainController extends Controller
+{
+	function index()
+	{
+		return view('main');
+	}
+}
+```
+
+E sobre esse tal Blade, o que ele é? O Blade é um motor de templates poderoso que vem integrado ao Laravel. Ele permite que você crie views de forma mais eficiente e legível, e é diferente de outros motores de templates porque não restringe o uso de PHP puro nas suas views.
