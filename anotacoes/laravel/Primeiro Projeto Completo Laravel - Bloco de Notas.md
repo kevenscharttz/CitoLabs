@@ -59,3 +59,18 @@ class MainController extends Controller
 ```
 
 E sobre esse tal Blade, o que ele é? O Blade é um motor de templates poderoso que vem integrado ao Laravel. Ele permite que você crie views de forma mais eficiente e legível, e é diferente de outros motores de templates porque não restringe o uso de PHP puro nas suas views.
+
+## Receber Parâmetros nas Rotas
+
+Nesta aula vi sobre receber parâmetros nas rotas do Laravel, permitindo que valores dinâmicos sejam passados para as views. É importante capturar valores, como números, que podem ser incluídos nas rotas. Podemos definir um parâmetro utilizando chaves nas rotas, transformando-o em uma variável acessível no método correspondente:
+
+```php
+Route::get('/main/{value}',[MainController::class, 'index']);
+```
+
+Para passarmos esse valor para uma view, primeiro vamos precisar alterar um pouco o nosso controlador. Existem duas formas de se passar os dados para a view, o que achei mais interessante foi o que usamos no método **view** como argumento, um array associativo, permitindo que variáveis sejam utilizadas na view: 
+```php
+return view('main', ['value' => $value]);
+```
+
+Existe outra forma, utilizando o método **with()**, onde passamos os dados de da mesma maneira, apenas trocando o **=>** por uma vírgula.
