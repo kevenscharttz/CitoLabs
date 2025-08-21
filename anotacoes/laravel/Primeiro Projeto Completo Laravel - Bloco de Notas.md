@@ -74,3 +74,15 @@ return view('main', ['value' => $value]);
 ```
 
 Existe outra forma, utilizando o método **with()**, onde passamos os dados de da mesma maneira, apenas trocando o **=>** por uma vírgula.
+
+## Views e Blade
+
+Nesta aula foi abordado brevemente sobre o motor de templates do Laravel, o Blade, que facilita a criação de views de forma mais eficiente. O Blade permite o uso de comandos específicos que simplificam a apresentação de dados, analisando o código nas views e traduzindo comandos para operações rápidas.
+
+Uma mudança na view que foi feita, removendo a inserção de dados comumente feita com uma short-hand do PHP, se mostrou mais interessante: 
+
+```php
+    <h3>The value parameter is:</h3>
+    <p>{{ $value }}</p>
+```
+
