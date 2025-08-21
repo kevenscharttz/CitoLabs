@@ -12,3 +12,5 @@ Route::get('/sobre', function () {
 });
 
 Route::get('/main/{value}',[MainController::class, 'index']);
+Route::get('/page1/{value}',[MainController::class, 'page1']);
+Route::get('/page2/{value}',[MainController::class, 'page2']);
