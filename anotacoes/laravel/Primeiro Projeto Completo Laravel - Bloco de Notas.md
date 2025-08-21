@@ -86,3 +86,50 @@ Uma mudança na view que foi feita, removendo a inserção de dados comumente fe
     <p>{{ $value }}</p>
 ```
 
+## Criando Layout para Múltiplas Views
+
+O foco dessa aula é sobre o uso de views que compartilham um layout em comum, permitindo uma estrutura mais organizada e reutilizável. Para começar, criei mais duas rotas, cada uma com valores a serem recebidos por parâmetro:
+
+```php
+Route::get('/page1/{value}',[MainController::class, 'page1']);
+Route::get('/page2/{value}',[MainController::class, 'page2']);
+```
+
+Para cada uma dessas rotas, criei métodos no controlador correspondente, que carregam views específicas. Só que se for notado, existe uma grande repetição de conteúdo igual entre as views, para resolver isso, fui introduzido ao conceito de **Layout**. Criei uma pasta chamada '**Layouts**' e, dentro dela, um arquivo de layout chamado '**Main Layout**', que contém a estrutura HTML básica a ser compartilhada entre as diferentes views.
+
+Nesse layout, o local onde o conteúdo que se difere entre as views são definidas por  uma variável do **Blade**, a variável é a "**@yield()**" onde por parâmetro passei a seção 'content' foi criada para permitir que cada view insira seu conteúdo dinâmico:
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <hr>
+    @yield('content_main')
+    <hr>
+</body>
+</html>
+```
+
+Com esse layout feito, agora podemos utilizá-lo nas views, onde utilizando uma variável do **Blade** chamada **@extends()** passamos o local onde esse layout se localiza, e depois usamos uma variável **@section()** para definir a qual local esse conteúdo pertence:
+
+```php
+@extends('layouts.main_layout')
+
+@section('content_main')
+
+    <h1>Welcome View Main and Blade!</h1>
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium quasi eaque tempore animi odio doloremque porro error eligendi omnis? Nemo recusandae explicabo odio reprehenderit maxime. Quae vel est quasi quo!</p>
+
+    <h3>The value parameter is:</h3>
+    <p>{{ $value }}</p>
+
+@endsection
+```
+
+## Limpando o código
