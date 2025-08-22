@@ -277,3 +277,20 @@ Um ponto crucial abordado foi a segurança dos formulários, especialmente a pro
 
 @csrf
 ```
+
+## Como Capturar os Dados do Formulário
+
+Nesta aula, o foco foi a captura de dados de formulários em Laravel. O começo foi  explicando como acessar as informações enviadas ao enviar um formulário, observando que, em Laravel, esses dados são encapsulados em um objeto de request. Com uma função, é demonstrado uma visualização do conteúdo do request, que permite ver detalhes como headers e atributos. Isso ajuda na depuração do código. A função é a **dd( )** ou  'dump and die'.
+
+Em seguida, extrai os dados específicos do request utilizando o método '**input()**'. Onde passamos como parâmetro o **name** do input especifico no formulário, para obtermos seu request. Como exemplificado acessando o 'username' e a 'password' submetidos pelo formulário de maneira simples, enfatizando a importância dessa abordagem para capturar e tratar as informações.
+
+```php
+    public function loginSubmit(Request $request)
+    {
+        echo 'login submit sucess';
+        echo '<br>';
+        echo $request->input('text_username');
+        echo '<br>';
+        echo $request->input('text_password');
+    }
+```
