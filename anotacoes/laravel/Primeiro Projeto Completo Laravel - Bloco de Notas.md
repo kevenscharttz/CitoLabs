@@ -250,3 +250,30 @@ public function login()
 	return view('login');
 }
 ```
+
+## CSRF e Submissão de Formulários
+
+Nesta aula foi discutido a importância da implementação de login em uma aplicação Laravel, desde sua criação até a segurança. Comecei com a estrutura básica do formulário que já existe na view, no campo **action** do formulário acrescentei a rota **/loginSubmit**, que pode ser colocada de outra maneira aqui, mas que iremos ver um pouco mais tarde.
+
+Depois, propriamente nas rotas, eu criei essa nova rota e já defini um nome para o método que irei criar posteriormente:
+
+```php
+Route::post('/loginSubmit', [AuthController::class, 'loginSubmit']);
+```
+
+Em seguida, com a rota criada, implementei o método que defini na rota no controlador, porém, o proposito desse método é justamente receber os dados enviados do formulário, então eu tenho que de alguma forma fazer com que esse método tenha esses dados. Para fazer isso, devo passar como parãmetro uma classe do Laravel citada lá no começo do curso, o **Request**, junto com a variável que será usada, que por padrão damos o nome de **$request**.
+
+```php
+public function loginSubmit(Request $request)
+{
+    echo 'login submit';
+}
+```
+
+Um ponto crucial abordado foi a segurança dos formulários, especialmente a proteção contra ataques CSRF (Cross-Site Request Forgery). O Laravel exige que todos os formulários incluam um token CSRF para evitar que agentes maliciosos enviem dados em nome de um usuário legítimo. O token é gerado automaticamente pelo Laravel e adicionado como um campo oculto no formulário, garantindo que apenas requisições legítimas sejam processadas:
+
+```php
+<form action="/loginSubmit" method="post">
+
+@csrf
+```
