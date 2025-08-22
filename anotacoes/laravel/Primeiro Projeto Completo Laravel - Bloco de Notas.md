@@ -334,3 +334,25 @@ Com acesso aos erros, podemos apresentá-lós em uma view, que pode ser feita ut
     </div>
  @endif
 ```
+
+## Mostrar Erros nos Inputs e Manter os Dados
+
+Nesta aula, foi discutido sobre como aprimorar a apresentação de erros em formulários no Laravel. A abordagem principal é exibir os erros diretamente abaixo dos campos específicos, em vez de colocá-los em uma caixa grande no final da página. Para implementar essa lógica, podemos usar condições que verificam se há erros associados a cada campo de entrada, como nome de usuário e senha, exibindo a mensagem de erro correspondente quando necessário:
+
+```php
+<label for="text_username" class="form-label">Username</label>
+<input type="text" class="form-control bg-dark text-info" name="text_username">
+
+{{-- Show Error --}}
+@error('text_username')
+    <div class="text-danger">
+        {{ $message }}
+    </div>
+@enderror
+```
+
+Adicionalmente, é vi a importância de manter os dados que o usuário já preencheu, mesmo em caso de erros. Para isso, usei a função '**old()**' do Laravel, onde passo por parâmetro o name da input correspondente, ela é utilizada para reter os valores nos campos, evitando que o usuário perca informações ao tentar enviar o formulário novamente:
+
+```php
+value="{{ old('text_username') }}">
+```
