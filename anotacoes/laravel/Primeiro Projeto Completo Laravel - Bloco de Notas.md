@@ -294,3 +294,43 @@ Em seguida, extrai os dados específicos do request utilizando o método '**inpu
         echo $request->input('text_password');
     }
 ```
+
+## Introdução à Validação de Dados
+
+Nesta aula, foi abordado sobre a introdução à validação de dados em formulários, enfatizando sua importância e os diferentes níveis de validação. O **primeiro** **nível** é a validação do **HTML5**, que utiliza o atributo '**required**' para marcar campos obrigatórios, mas essa abordagem pode ser facilmente contornada. O **segundo** **nível** envolve o uso de **JavaScript** para validação no lado do cliente, que também pode ser desativado, tornando-a menos confiável. Portanto, o **terceiro** **nível**, que é a validação do lado do servidor, se torna o mais crucial, pois garante que todos os dados sejam verificados antes de serem processados, aumentando a segurança do sistema.
+
+A implementação da validação no Laravel foi feita utilizando o método '**validate()**' para definir regras para campos como '**username**' e '**password**'. Vi como usar arrays ou pipes para definir múltiplas regras e a importância de retornar erros de validação para o usuário. Quando um erro é detectado, o Laravel armazena esses erros na sessão e os apresenta na página do formulário, permitindo que o usuário saiba quais campos precisam ser corrigidos.
+
+```php
+    public function loginSubmit(Request $request)
+    {
+        //form validation
+        $request->validate(
+            [
+                'text_username' => ['required', 'min:3', 'max:25'],
+                'text_password' => ['required', 'min:6', 'max:25'],
+            ]
+        );
+
+        //get user input
+        $username = $request->input('text_username');
+        $password = $request->input('text_password');
+        echo 'OK!';
+    }
+```
+
+Com acesso aos erros, podemos apresentá-lós em uma view, que pode ser feita utilizando a sintaxe do Blade. Fiz um **if** para caso exista qualquer erro, seja criado uma div com uma lista não ordenada, dentro dessa lista fiz um **foreach**, para que seja colocado cada erro: 
+
+```php
+{{-- Errors --}}
+
+@if ($errors->any())
+    <div class="class alert alert-danger mt-3">
+        <ul class="class m-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+ @endif
+```
