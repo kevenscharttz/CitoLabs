@@ -133,3 +133,120 @@ Com esse layout feito, agora podemos utilizá-lo nas views, onde utilizando uma 
 ```
 
 ## Limpando o código
+
+Está aula foi destinada a limpeza de código, foram removidas todas as views, controllers e rotas que fizemos até o momento.  Também foram removidos arquivos que vieram como padrão no projeto Laravel, como as migrations. seeders, factorys, models, e algumas configurações do arquivo **.env**.
+
+## Controller para Autenticação
+
+Nesta aula, o foco foi dar inicio ao desenvolvimento da aplicação chamada **Notes** usando o framework Laravel. Foi brevemente discutido que o objetivo desse projeto não é necessariamente usarmos a grande quantidade de recursos do Laravel, mas sim os conceitos fundamentais dele, como:
+
+1. **Estrutura do Projeto**: Utilização de rotas, controladores, modelos, views e o motor de templates Blade.
+2. **Base de Dados**: Uso de MySQL, incluindo migrations e seeds.
+
+A primeira coisa que fiz foi criar um controller via artisan, onde criei dois métodos, um referente ao **login** e outro ao **logout**:
+
+```php
+class AuthController extends Controller
+{
+    public function login()
+    {
+        echo 'login';
+    }
+
+    public function logout()
+    {
+        echo 'logout';
+    }
+}
+```
+
+A partir disso, fui até a área de rotas e defini as rotas que levam até os métodos desse controlar:
+
+```php
+//Auth routes
+Route::get('/login', [AuthController::class, 'login']);
+Route::get('/logout', [AuthController::class, 'logout']);
+```
+
+## Criando Layout Base da Aplicação e o Formulário de Login
+
+Nesta aula, o foco foi na criação do layout base da aplicação e no desenvolvimento do formulário de login utilizando Laravel. O processo inicia com a cópia da pasta de assets disponibilizada pelo instrutor para a pasta public do projeto, garantindo a disponibilidade dos recursos necessários. Logo após, crio um layout principal com o comando Artisan do Laravel, organizando os arquivos para que o cabeçalho e o rodapé sejam fáceis de gerenciar. O layout é elaborado para ser genérico, possibilitando que diferentes páginas da aplicação compartilhem a mesma estrutura. Alteramos os links de referência para que funcionem com o uso da sintaxe do Blade, o motor de templates do Laravel, para carregar assets corretamente e facilitar a renderização do conteúdo dinâmico nas views:
+
+```php
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOTES</title>
+    <link rel="stylesheet" href="{{asset('assets/bootstrap/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{asset('assets/fontawesome/css/all.min.css') }}">
+    <link rel="shortcut icon" href="{{asset('assets/images/favicon.png') }}" type="image/png">
+</head>
+<body>
+
+    @yield('content');
+
+
+    <script src="{{asset('assets/bootstrap/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>
+```
+
+Após a criação desse layout, criamos de fato a view do nosso formulário de login usando de base o designe dado pelo instrutor, apenas o interligando com o layout genérico que acabei de fazer:
+
+```php
+@extends('layouts.main_layout')
+@section('content')
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-sm-8">
+                <div class="card p-5">
+
+                    <!-- logo -->
+                    <div class="text-center p-3">
+                        <img src="assets/images/logo.png" alt="Notes logo">
+                    </div>
+
+                    <!-- form -->
+                    <div class="row justify-content-center">
+                        <div class="col-md-10 col-12">
+                            <form action="#" method="post">
+                                <div class="mb-3">
+                                    <label for="text_username" class="form-label">Username</label>
+                                    <input type="text" class="form-control bg-dark text-info" name="text_username"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="text_password" class="form-label">Password</label>
+                                    <input type="password" class="form-control bg-dark text-info" name="text_password"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <button type="submit" class="btn btn-secondary w-100">LOGIN</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- copy -->
+                    <div class="text-center text-secondary mt-3">
+                        <small>&copy; <?= date('Y') ?> Notes</small>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+```
+
+Por fim, fui até o método de login do controlador e o fiz retornar essa view:
+
+```php
+public function login()
+{
+	return view('login');
+}
+```
