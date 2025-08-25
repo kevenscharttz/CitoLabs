@@ -356,3 +356,40 @@ Adicionalmente, é vi a importância de manter os dados que o usuário já preen
 ```php
 value="{{ old('text_username') }}">
 ```
+
+## Definir textos personalizados para os erros de validação
+
+ O foco da aula foi na personalização de mensagens de erro para validações em formulários, especificamente para os campos de **username** e password. É importante substituir as mensagens de erro padrão em inglês por mensagens personalizadas em português, além disso,  vi como implementar regras de validação para os campos. Comecei definindo um array com as regras de validação, como assegurar que o **username** seja um **email** e que a password tenha entre seis e dezesseis caracteres. Depois, adicionei regras extras, como usar um pipe para validar o formato do email, e é mencionado a possibilidade de ignorar as validações padrão do HTML5.
+
+```php
+public function loginSubmit(Request $request)
+{
+        //form validation
+    $request->validate(
+
+            // rules
+        [
+            'text_username' => ['required', 'min:6', 'email'],
+            'text_password' => ['required', 'min:6', 'max:25'],
+        ],
+            // errors messages
+        [
+            'text_username.required' => 'O username é obrigatório',
+            'text_username.email' => 'Insira um e-mail válido',
+            'text_username.min' => 'O username deve possuir ao menos 6 caracteres',
+
+            'text_password.required' => 'A sennha é obrigatório',
+            'text_password.max' => 'A senha pode ter no máximo :max caracteres',
+            'text_password.min' => 'A senha deve possuir ao menos :min caracteres',
+        ]
+    );
+
+        //get user input
+    $username = $request->input('text_username');
+    $password = $request->input('text_password');
+    echo 'OK!';
+}
+```
+
+
+Posteriormente, é abordado a definição de mensagens de erro personalizadas, permitindo que o desenvolvedor especifique os textos que serão exibidos para cada tipo de erro, como quando o username está vazio ou não é válido, e a requirementos da password. No final da aula, é feita uma demonstração prática das validações e mensagens personalizadas em funcionamento, enfatizando a importância de manter a consistência nas mensagens e como isso melhora a experiência do usuário ao interagir com os formulários.
