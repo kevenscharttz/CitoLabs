@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="{{asset('assets/images/favicon.png') }}" type="image/png">
 </head>
 <body>
-
+    
     @yield('content');
 
 
