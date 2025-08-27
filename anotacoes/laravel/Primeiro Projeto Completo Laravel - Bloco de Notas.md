@@ -570,3 +570,86 @@ $user->last_login = date('Y-m-d H:i:s');
 $user->save();
 ```
 
+## Efetuando o Logout
+
+Nesta aula, foi discutido sobre o processo de logout em uma aplicação web. Começamos revisando o que ocorre após um login bem-sucedido, quando um **cookie** de sessão é criado no navegador. O foco principal foi a implementação do método de logout no controlador de autenticação (**AuthController**). O primeiro passo para efetuar o logout é remover o usuário da sessão com o comando '**session()->forget('user')**', especificando a chave do usuário que desejamos esquecer. Isso garante que a sessão será limpa ao executar o logout, removendo qualquer informação do usuário logado
+
+Após a remoção do usuário da sessão, redirecionamos o usuário de volta para a página de login utilizando '**return redirect()**', apontando para a rota de login definida nas rotas da aplicação, usando o método **to()**:
+
+```php
+public function logout()
+    {
+        // logout from the application
+        session()->forget('user');
+        return redirect()->to('/login');
+    }
+```
+
+##  Fluxo Normal de Um Sistema com Autenticação
+
+Nesta aula, foi discutido sobre o fluxo normal de um sistema de autenticação, com foco nos processos de login e logout, especialmente no contexto do Laravel. O fluxo começa quando um usuário tenta acessar páginas protegidas que exigem autenticação. Se o usuário não estiver logado, ele será redirecionado para um formulário de login. Com um login bem-sucedido, o usuário ganha acesso à aplicação.
+
+Além disso, abordamos a importância do logout, que destrói a sessão do usuário, retornando-o ao estado não autenticado e reiniciando o ciclo. Um conceito fundamental discutido foi o **middleware**, um pedaço de código executado em rotas específicas que verifica se o usuário está autenticado antes de permitir o acesso a determinadas áreas da aplicação. Isso centraliza a lógica de verificação em um único ponto e ajuda a garantir segurança, redirecionando usuários não autenticados para a página de login.
+
+## Introdução ao Middleware
+
+Nesta aula, vi sobre o conceito de middleware e sua implementação em uma aplicação Laravel. Iniciou com a importância do middleware na gestão de rotas, especialmente no controle de acesso de usuários logados. A aula começa com a criação de uma rota base que redireciona o usuário para a página principal após um login bem-sucedido. Em seguida, introduzimos métodos no controlador, como o método '**Index**' e um método temporário para criar uma nova nota:
+
+```php
+class MainController extends Controller
+{
+    function index()
+    {
+        echo "I'm inside the app !";
+    }
+
+    function newNote()
+    {
+        echo "I'm creating a new note";
+    }
+}
+
+```
+
+Um ponto crucial tratado foi a separação das rotas que exigem autenticação e aquelas que não. Por exemplo, rotas de login não devem ser acessíveis a um usuário já autenticado, enquanto rotas como logout devem ser restritas a usuários logados. Para gerenciar isso, criamos um middleware que verifica se o usuário está logado antes de permitir o acesso a determinadas rotas. O **middleware** é criado usando o comando `PHP Artisan`, recebendo um nome descritivo para fácil identificação. Sua função principal é verificar a sessão do usuário; se não estiver logado, o usuário é redirecionado para a página de login. Demonstramos como aplicar o middleware a grupos de rotas, garantindo que apenas usuários autenticados possam acessá-las:
+
+```php
+public function handle(Request $request, Closure $next): Response
+    {
+        // check if user is logged
+        if (!session('user')){
+            return redirect('/login');
+        }
+        return $next($request);
+    }
+}
+```
+
+Por fim, foi enfatizado sobre a importância de testar o **middleware**, mostrando como ele impede o acesso a rotas restritas quando um usuário não está logado. Também mencionamos a necessidade de um segundo middleware para certificar que usuários logados não consigam acessar a página de login novamente.
+
+## Middleware adicional
+
+Nesta aula, vi  sobre a criação de um middleware adicional para gerenciar o acesso a rotas em nossa aplicação. O objetivo principal foi garantir que usuários logados não possam acessar a página de login.
+
+Iniciamos revisando o estado da aplicação, onde foi confirmado que um usuário estava logado. Depois, realizamos o logout, assegurando que não havia usuários ativos. Em seguida, desenvolvemos o middleware chamado **'CheckNotLogged'**, que verifica se um usuário está logado antes de permitir o acesso à página de login. Caso um usuário logado tente acessar essa página, o sistema o redireciona automaticamente para a página inicial.
+
+```php
+    {
+        // check if user is not logged
+        if (session('user')){
+            return redirect('/');
+        }
+        return $next($request);
+
+    }
+```
+
+Para implementar isso, utilizamos o comando PHP Artisan Make para criar o middleware e ajustamos o código para verificar a sessão do usuário. Depois, aplicamos essa lógica de verificação nas rotas relevantes, usando a função de middleware para englobar as rotas de login.
+
+```php
+Route::middleware([CheckNotLogged::class])->group(function(){
+    Route::get('/login', [AuthController::class, 'login']);
+    Route::post('/loginSubmit', [AuthController::class, 'loginSubmit']);
+});
+```
+
