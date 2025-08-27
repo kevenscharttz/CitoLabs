@@ -393,3 +393,180 @@ public function loginSubmit(Request $request)
 
 
 Posteriormente, é abordado a definição de mensagens de erro personalizadas, permitindo que o desenvolvedor especifique os textos que serão exibidos para cada tipo de erro, como quando o username está vazio ou não é válido, e a requirementos da password. No final da aula, é feita uma demonstração prática das validações e mensagens personalizadas em funcionamento, enfatizando a importância de manter a consistência nas mensagens e como isso melhora a experiência do usuário ao interagir com os formulários.
+
+## Vamos criar uma base de dados
+
+Nesta aula, meu foco foi na criação de um banco de dados para o projeto. Primeiro comecei configurando um ambiente de desenvolvimento local, criando um banco de dados chamado **Laravel_Notes**, e um usuário especifico para acessá-la, garantindo permissões necessárias. Em seguida, detalhou o processo de configuração do arquivo de ambiente (.env) para conectar o Laravel à base de dados **MySQL**:
+
+```json
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel_notes
+DB_USERNAME=user_laravel_notes
+DB_PASSWORD=@cito2025
+```
+
+Após configurar essas credenciais, fiz um teste de conexão utilizando a **facade DB** do Laravel usando um bloco try-catch para lidar com possíveis erros. O instrutor mencionou que, embora a conexão tenha sido estabelecida, a base de dados ainda estava vazia, sendo necessário criar tabelas e inserir dados para que o sistema funcione corretamente.
+
+
+## Introdução as Migrations
+
+Nesta aula foi abordados o conceito de migrations no Laravel, que são essenciais para gerenciar a estrutura de tabelas do banco de dados. A aplicação já está conectada a uma database, porém não tinha ainda tabelas criadas. Para o nosso sistema de notas, são necessárias duas tabelas: uma para os usuários e uma outra para as notas. A **migration** é um arquivo PHP que define a estrutura de uma tabela, e para cada tabela que desejamos criar, precisamos de uma migration correspondente.
+
+Como nós criamos uma migration? Bom, rodando o comando **```php artisan make:migration```** nós criamos essa migration, posteriormente a isso incluimos o nome dessa migration, o que não é importante apenas para o nome e pronto, isso ajuda o Laravel a criar de maneira mais adequada essa migration, dessa forma podemos definir o tipo do schema e o nome da tabela:
+
+```
+php artisan make:migration create_notes_table
+```
+
+Após isso o Laravel cria um arquivo na pasta Database/Migrations, contendo os métodos **up** (para criar a tabela) e down (**para** reverter a migração).
+
+Para a tabela de usuários, a sua estrutura é composta por: username, password, last login, created at, updated at e deleat at.  O ID é um inteiro e é a chave primária, com o método **autoIncrement()**, fazemos ele aumentar sozinho seu valor conforme mais dados são colocados no banco, username e password são do tipo varchar, ou no caso do código, string. Já os campos de data são do tipo datetime ou timestamps.  Por fim, um detalhe importante é que o **created_at** e o **update_at** são criados automaticamente utilizando o método **timestamps( )**, e que estamos usando um outro método para não apagar de fato um dado do sistema, e sim mandar ele para outro local separado, nós chamamos isso de **soft delete**:
+
+```php
+public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+
+            $table->id()->autoIncrement();
+
+            // nullable = can be null
+            $table->string('username', 50)->nullable();
+            $table->string('password', 200)->nullable();
+            $table->datetime('last_login')->nullable();
+
+            // created_at, updated_at
+            $table->timestamps();
+
+            $table->softDeletes();
+        });
+    }
+```
+
+Recapitulando executei o comando `php artisan migrate` para criar as tabelas na base de dados, e o Laravel mantém um histórico de migrações em uma tabela chamada migrations. Se uma coluna foi esquecida, podemos usar o comando abaixo para reverter a última migração.
+
+```
+php artisan migrate:rollback
+```
+
+
+## Introdução às Seeders
+
+Está aula foi sobre o conceito de **seeders** no Laravel, que são utilizados para preencher tabelas com dados de teste após a realização de uma migração. O processo de criação de uma seed foi demonstrada passo a passo, começando pela execução do comando PHP Artisan para gerar um arquivo **seeding**, que deve ser nomeado de forma adequada, como no caso das **migrations**:
+
+```
+php artisan make:seeder UsersTableSeeders
+```
+
+Dando foco apenas para uma coisa, foquei em fazer as inserções na tabela de usuários. Como explicado, o método **DB::table()** permite espeficarmos a tabela, e o método **inser()** para adicionar os registros. FOi mostrado como criar um array associativo para definir os valores a serem inseridos, incluindo o nome de usuário e a senha, que é encriptada usando a função **password_hash**, posteriormente substituída por **bcrypt()**, e por quê? Porque tradicionalmente o tipo de encriptação que é pedida no password_hash é o bcrypt, então podemos usa-ló direto:
+
+```php 
+ public function run(): void
+    {
+        // create multiple users
+        DB::table('users')->insert([
+            [
+                'username' => 'user1@gmail.com',
+                'password' => bcrypt('abc123456'),
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'username' => 'user2@gmail.com',
+                'password' => bcrypt('abc123456'),
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'username' => 'user3@gmail.com',
+                'password' => bcrypt('abc123456'),
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'username' => 'user4@gmail.com',
+                'password' => bcrypt('abc123456'),
+                'created_at' => date('Y-m-d H:i:s'),
+            ]
+        ]);
+    }
+```
+
+Ademais, para adicionar múltiplos usuários, foi feito um array de arrays associativos. 
+
+## Introdução aos Models
+
+Nesta aula,  vi a introdução aos Models no Laravel, focando no padrão **MVC** (Model View Controller). Revisando conceitos como rotas, controllers, views, Blade, migrations e a conexão com bancos de dados, destacando a importância dos models na comunicação com as bases de dados. Explorei o Eloquent ORM do Laravel, que facilita a interação com o banco de dados através de objetos PHP, e vi como criar models usando o comando:
+
+```php
+php artisan make:model
+```
+
+Foi destacado que o nome do model deve ser singular, pois o Laravel associa automaticamente a tabela no plural (exemplo: '**User**' se relaciona com a tabela '**users**').
+
+Foi mostrado também como verificar o funcionamento do model através do **Auth Controller**, utilizando o método '**all( )**' para buscar todos os usuários da base de dados. Ao final, discutimos a criação de objetos do model e a execução de métodos para acessar os dados, reforçando a facilidade que o Laravel oferece na manipulação de dados em aplicações web.
+
+```php
+    // get all users from the database
+    
+    /**
+    * pegar todos os dados da tabela de users, e passar para um array
+    */
+    $users = User::all()->toArray();
+
+    //as an object instance of the model's class
+    $userModel = new User();
+    $users = $userModel->all()->toArray();
+        
+    dd($users);
+```
+
+A diferença entre as duas abordagens é principalmente a forma como você instancia e interage com o modelo `User`, mas ambas têm o mesmo resultado final.  Aqui,  no primeiro caso, estou chamando o método ```all()``` diretamente na classe `User`. Isso retorna uma `Collection` de objetos `User`. Depois chamando o método `toArray()`, essa coleção é convertida em um array simples.
+
+Nesta segunda versão, é criado uma instância do modelo `User` e depois chama o método `all()`. O comportamento é o mesmo, e o resultado é uma `Collection` que depois é convertida em array pelo `toArray`.
+
+## Autenticação Básica de Users
+
+Nesta aula, abordei a autenticação básica de usuários em um sistema. Iniciei revisando como recuperar informações da tabela de usuários e, em seguida, foquei na lógica necessária para validar os dados inseridos no formulário de login.
+
+Primeiro, verifiquei se o nome de usuário existe. Se não existir, consideramos o login incorreto. Caso não exista, é dado como retorno o redirecionamento para a página anterior, sem perder os dados dos inputs e com uma mensagem de erro que criei:
+
+```php
+if (!$user){
+
+    /**
+    * Redireciona para a página anterior com os inputs e com uma mensagem de erro, que temos acesso com a chave.
+    */
+     return redirect()
+        ->back()
+        ->withInput()
+        ->with('loginError', 'Username ou Password incorreto');
+}
+```
+
+E como fazemos a mensagem de erro aparecer? Vamos até a view e fazemos uma condicional. Caso exista a chave de erro na sessão, será criado uma div com o texto do erro: 
+
+```php
+@if (@session('loginError'))
+    <div class="alert alert-danger text-center">
+        {{ session('loginError') }}
+    </div>
+@endsession
+```
+
+Agora, caso o usuário esteja correto, será necessário verificarmos se a senha desse usuário está correta também para a validação da senha com a função '**password_verify( )**' do PHP. Se a validação falhar, redirecionamos novamente com uma mensagem de erro:
+
+```php
+if (!password_verify($password, $user->password)){
+	return redirect()
+		->back()
+		->withInput()
+		->with('loginError', 'Username ou Password incorreto');
+}
+```
+
+Se ambos os testes forem bem-sucedidos, atualizamos a coluna '**last_login**' do usuário e armazenamos os dados na sessão, confirmando que o usuário está logado: 
+
+```php
+$user->last_login = date('Y-m-d H:i:s');
+$user->save();
+```
+
