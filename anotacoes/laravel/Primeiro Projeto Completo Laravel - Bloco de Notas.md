@@ -653,3 +653,165 @@ Route::middleware([CheckNotLogged::class])->group(function(){
 });
 ```
 
+## Dados do User, Named Routes e Logout
+
+Nesta aula, o foco foi na implementação de rotas nomeadas e na funcionalidade de logout em uma aplicação Laravel. Primeiro foi discutido sobre a importância de carregar as notas do usuário e como as rotas podem ser organizadas. Após o login, o usuário tem acesso a um layout que inclui um botão de logout e links para criar notas.
+
+O conceito de nomear rotas é introduzido, explicando que dar nomes para as rotas facilita a referência em código. Isso foi demonstrado como adicionar nomes às rotas utilizando o método '**name**', como 'Home', '**New**' e '**Logout**'. Ele também mostra como usar a função '**route**' do Laravel para criar links mais legíveis, ao invés de usar caminhos de URL diretamente.
+
+```php
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ route('new') }}" class="btn btn-secondary px-3">
+        <i class="fa-regular fa-pen-to-square me-2"></i>New Note
+    </a>
+</div>
+```
+
+O uso de duplo mustache para definir rotas é enfatizado, tornando o código mais claro. Ao final, ao atualizar a página, os links para as **notas** e **logout** funcionam corretamente, destacando um fluxo de navegação eficiente na aplicação.
+
+
+## Barra de Topo para todas as views
+
+Nesta aula, o foco foi na implementação de uma barra de topo reutilizável em uma aplicação Laravel. Discutiusse a necessidade de ter essa barra em várias páginas, exceto na página de login, e foi proposto desacoplar a barra do topo criando uma nova view chamada 'Top Bar', servindo como um tipo de componente.
+
+O processo começa com a identificação do código da barra existente, que é copiado e removido da homepage. Um novo arquivo de view é criado usando o comando '**```PHP Artisan Make: View Top_Bar```**', onde o código é colado. Isso permite que a barra de topo seja incluída em qualquer página da aplicação utilizando a instrução 'include' do Blade:
+
+```php
+<div class="row mb-3 align-items-center">
+    <div class="col">
+        <a href="{{ route('home') }}">
+            <img src="assets/images/logo.png" alt="Notes logo">
+        </a>
+    </div>
+    <div class="col text-center">
+        A simple <span class="text-warning">Laravel</span> project!
+    </div>
+    <div class="col">
+        <div class="d-flex justify-content-end align-items-center">
+            <span class="me-3"><i class="fa-solid fa-user-circle fa-lg text-secondary me-3"></i>[username]</span>
+            <a href="{{ route('logout') }}" class="btn btn-outline-secondary px-3">
+                Logout<i class="fa-solid fa-arrow-right-from-bracket ms-2"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<hr>
+```
+
+É demonstrado depois como incluir a barra de topo no arquivo desejado, sendo através da funcionalidade do Blade chamada **@include( )**, onde passamos por parâmetro o arquivo:
+
+```php
+@include('top_bar')
+```
+
+## Carregando as Notas do User Logado
+
+Nesta aula, vi sobre o processo de carregamento das notas associadas ao usuário logado em uma aplicação. O foco principal é a relação entre a tabela de usuários e a tabela de notas, caracterizando uma relação de um para muitos (one to many).
+
+O conceito de ORM (Object Relational Mapping) é introduzido, destacando o modelo Eloquent do Laravel, que facilita a definição dessas relações. Mostramos como criar um modelo para as notas e estabelecer a relação entre os modelos de usuários e notas. Os passos práticos incluem a criação do modelo de notas usando o comando PHP Artisan e a definição de métodos que conectam os dois modelos. No modelo de usuário, criamos um método para retornar todas as notas associadas, e no modelo de notas, definimos que cada nota pertence a um usuário.
+
+Para definir que os usuários possuem as notas, fiz: 
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+}
+
+```
+
+E para definir que as notas pertencem ao usuário eu fiz:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Note extends Model
+{
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+
+```
+
+## Apresentando as Notas do User Logado
+
+Nesta aula, o foco é na apresentação das notas de um usuário logado. Foi explica que, após carregar as notas, é importante limpar o código para facilitar a apresentação.  O processo envolve localizar o usuário através do modelo e buscar as notas, que são transformadas em um array associativo:
+
+```php
+    function index()
+    {
+        // load user's notes
+        $id = session('user.id');
+        $notes = User::find($id)->notes()->get()->toArray();
+
+        //show home view
+        return view('home', ['notes' => $notes]);
+    }
+```
+
+Em seguida, vi como passar essas notas para a view principal e implementa uma lógica condicional que exibe mensagens diferentes dependendo da existência de notas, utilizando uma estrutura condicional IF e ELSE, e depois iterando as notas com um loop foreach, apresentando informações como título, data de criação e texto:
+
+```php
+@if (count($notes) == 0)
+<div class="row mt-5">
+    <div class="col text-center">
+        <p class="display-6 mb-5 text-secondary opacity-50">You have no notes available!</p>
+        <a href="{{ route('new') }}" class="btn btn-secondary btn-lg p-3 px-5">
+            <i class="fa-regular fa-pen-to-square me-3"></i>Create Your First Note
+        </a>
+    </div>
+</div>
+
+
+<!-- temp -->
+<hr class="my-5">
+@else
+	<!-- notes are available -->
+	<div class="d-flex justify-content-end mb-3">
+	    <a href="{{ route('new') }}" class="btn btn-secondary px-3">
+	        <i class="fa-regular fa-pen-to-square me-2"></i>New Note
+	    </a>
+	</div>
+	@foreach ($notes as $note)
+	<div class="row">
+	    <div class="col">
+	        <div class="card p-4">
+	            <div class="row">
+	                <div class="col">
+	                    <h4 class="text-info">{{ $note['title'] }}</h4>
+	                    <small class="text-secondary"><span class="opacity-75 me-2">Created
+	                            at:</span><strong>{{ $note['created_at'] }}</strong></small>
+	                </div>
+	                <div class="col text-end">
+	                    <a href="#" class="btn btn-outline-secondary btn-sm mx-1"><i
+	                            class="fa-regular fa-pen-to-square"></i></a>
+	                    <a href="#" class="btn btn-outline-danger btn-sm mx-1"><i class="fa-regular fa-trash-can"></i></a>
+	                </div>
+	            </div>
+	            <hr>
+	            <p class="text-secondary">{{ $note['text'] }}
+	            </p>
+	        </div>
+	    </div>
+	</div>
+	@endforeach
+@endif
+```
+
+Posteriormente, passamos a parte do foreach para uma view separada, componentizando essa parte, deixando o código menor.
